@@ -18,7 +18,6 @@ const Signin = () => {
           <li>e</li>
           <li>!</li>
         </ul>
-        <h1 id="welcome-mobile">Welcome!</h1>
         <Form className="signInForm" method="POST">
           <h2 id="welcomeMessage">Sign in and let's get started!</h2>
           <input

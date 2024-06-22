@@ -359,18 +359,22 @@ main {
 
 .container {
   display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex: 1 1 auto;
 }
 
 #welcome {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
   color: white;
   margin-top: 150px;
-  margin-left: 250px;
-  padding: 50px;
 }
 
 #welcome li {
   list-style: none;
-  float: left;
   font-size: 70px;
   font-weight: 700;
   transition: 1.8s;
@@ -391,8 +395,9 @@ main {
   display: flex;
   flex-direction: column;
   max-width: 400px;
-  margin-top: 60px;
-  margin-left: 350px;
+  margin: 0 auto;
+  justify-content: center;
+  align-items: center;
 }
 
 #welcomeMessage {
@@ -414,7 +419,7 @@ main {
 }
 
 .submitbutton {
-  width: 40%;
+  width: 60%;
   display: block;
   margin: 20px auto;
   height: 40px;
@@ -431,6 +436,7 @@ main {
   max-width: -webkit-fit-content;
   max-width: -moz-fit-content;
   max-width: fit-content;
+  padding: 15px;
 }
 
 .submitbutton:hover {
@@ -448,10 +454,12 @@ main {
 .welcomeImgContainer {
   width: 50%;
   display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .welcome-img {
-  width: 700px;
+  width: 100%;
   margin: 150px 250px 0 0;
 }
 
@@ -465,13 +473,13 @@ main {
   }
 }
 
-@media screen and (max-width: 1440px) {
+@media screen and (max-width: 1100px) {
   .container {
     flex-direction: column;
   }
 
   .welcomeFormContainer {
-    margin: 0 auto;
+    margin: 75px auto;
     width: 100%;
     align-items: center;
     justify-content: center;
@@ -485,7 +493,7 @@ main {
   }
 
   .welcome-img {
-    max-width: 500px;
+    max-width: 80%;
   }
 
   #welcome {
@@ -493,13 +501,6 @@ main {
     margin: 50px auto 25px auto;
     display: flex;
     flex-direction: row;
-  }
-
-  #welcome-mobile {
-    text-align: center;
-    color: #fff;
-    font-size: 60px;
-    margin-top: -100px;
   }
 
   #welcome-mobile:hover {
@@ -510,7 +511,6 @@ main {
   #welcome li {
     font-size: 60px;
     text-align: center;
-    display: none;
   }
 
   #welcomeMessage {

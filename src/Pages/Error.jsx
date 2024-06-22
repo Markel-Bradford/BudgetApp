@@ -9,7 +9,6 @@ const Error = () => {
   return (
     <div className='error'>
       <h1>Whoops! We ran into a problem!</h1>
-      <p id='err-message'>{error.message|| error.statusText}</p>
       <div className='flex-md'>
         <button className='btn--err' onClick={() => goBack(-1)}>
           <ArrowUturnLeftIcon width={20} />
