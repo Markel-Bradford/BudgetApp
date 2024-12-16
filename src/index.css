@@ -47,6 +47,10 @@ body {
 width: 100%;
 }
 
+main {
+  height: 100vh;
+}
+
 h3 {
   margin-left: 20px;
   margin-top: 30px;
@@ -61,7 +65,7 @@ h1 {
 
 .sectionTitle {
   font-size: 42px;
-  margin-top: -50px;
+  margin-top: -25px;
   margin-left: 55px;
   color: #ffffff;
 }
@@ -201,8 +205,10 @@ main {
 }
 
 .nav-menu {
-  display: grid;
-  grid-gap: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 30px;
   list-style: none;
   height: 40px;
   text-align: center;
@@ -220,7 +226,7 @@ main {
   display: flex;
   align-items: center;
   text-decoration: none;
-  padding: 0rem .5rem;
+  padding: .5rem 1rem;
   height: 100%;
   border: solid 2px #fff;
   border-radius: 12px;
@@ -231,7 +237,16 @@ main {
   background-color: red;
   color: var(--color);
   border: black 2px solid;
-  transition: .8s;
+  transition: .3s;
+}
+
+.btn--info {
+  background-color: #0a536d;
+}
+
+.btn--info:hover {
+  background: #FFD700;
+  transition: .3s;
 }
 
 @media screen and (max-width: 1024px) {
@@ -349,7 +364,12 @@ main {
   .welcome {
     margin-left: 0;
     text-align: center;
-    font-size: 2.8em;
+    font-size: 2.5em;
+  }
+  .sectionTitle {
+    text-align: center;
+    margin-left: 0;
+    font-size: 2.3em;
   }
 }
 
@@ -533,12 +553,6 @@ main {
   }
 }
 
-@media screen and (min-width: 1441px) {
-  #welcome-mobile {
-    display: none;
-  }
-}
-
 
 
 
@@ -548,7 +562,7 @@ main {
   -webkit-box-flex: 1;
   -ms-flex: 1 1 48%;
   flex: 1 1 48%;
-  margin: 0 auto 50px auto;
+  margin: 0 auto 25px auto;
   max-width: 600px;
   position: relative;
   display: grid;
@@ -661,8 +675,8 @@ label {
   display: -ms-grid;
   display: grid;
   -webkit-box-flex: 1;
-  -ms-flex: 1 1 32.2%;
-  flex: 1 1 32.2%;
+  -ms-flex: 1 1 auto;
+  flex: 1 1 auto;
   max-width: 600px;
   -webkit-box-shadow: 0.25em 0.3em 1em hsl(var(--muted) / 0.2);
   box-shadow: 0.25em 0.3em 1em hsl(var(--muted) / 0.2);
@@ -742,6 +756,80 @@ progress[value]::-webkit-progress-value {
 
 small {
   font-size: small;
-  line-height: var();
   color: var(--accent);
+}
+
+@media screen and (max-width: 600px) {
+  .budgetName {
+    font-size: 22px;
+  }
+  
+  .budgAmount {
+    font-size: 15px;
+  }
+}
+
+.expense {
+  background-color: #ffffff;
+  border-top: 15px solid #fff;
+  border-bottom: 15px solid #fff;
+  border-left: 15px solid #fff;
+  border-right: 15px solid #fff;
+}
+
+.form-wrapper::before {
+  content: "";
+  border: 3px solid #0a536d;
+  position: absolute;
+  inset: .1rem;
+  z-index: 1;
+  border-radius: 9px;
+}
+
+/* Budget List */
+.budgetList {
+  margin: 25px 0;
+}
+
+.budgetExpenseList {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border: #FFD700 2px solid;
+  border-radius: 16px;
+  padding:0 20px 25px 20px;
+}
+
+.expenseList {
+  opacity: 1;
+  transition: all .5s ease;
+}
+
+.expenseListHidden {
+  opacity: 0;
+  transition: all ease;
+  position: absolute;
+  top: -10%;
+}
+
+.budgetListName {
+  color: #ffffff;
+  display: flex;
+  justify-content: space-between;
+  margin-left: 0;
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+
+.expenseDetailsContainer {
+  display: flex;
+  flex-direction: column;
+  color: #ffffff;
+  padding: 8px 0;
+  border-bottom: #FFFFFF 2px solid;
+}
+
+.expenseDetails {
+  display: flex;
+  justify-content: space-between;
 }

@@ -8,11 +8,12 @@ export async function logoutAction() {
     // delete the user
 
     deleteItem({
-        key: "userName"
+        type: "user" 
     });
+    console.log("User logged out.")
 
     toast.success(
-        "You've successfully deleted your account!"
+        "You've successfully logged out!"
     );
 
     //return redirect

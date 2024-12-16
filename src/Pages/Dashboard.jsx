@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useLoaderData, Form } from "react-router-dom";
 import { fetchData, newBudget, wait, newExpense } from "../helpers";
 import Signin from "../Components/Signin";
@@ -6,10 +6,12 @@ import { toast } from "react-toastify";
 import AddBudgetForm from "../Components/AddBudgetForm";
 import AddExpenseForm from "../Components/AddExpenseForm";
 import BudgetItem from "../Components/BudgetItem";
+import Expenses from "../Components/Expenses";
+import { Budgets } from "../Data/Budgets";
 
 //Dashboard loader
 export function dashboardLoader() {
-  const userName = fetchData("userName");
+  const userName = fetchData("user");
   const budgets = fetchData("budgets");
   const expenses = fetchData("expenses");
   return { userName, budgets, expenses };
@@ -22,12 +24,22 @@ export async function dashboardAction({ request }) {
   const data = await request.formData();
   // Separates out the actions by the value to prevent repetively creating actions
   const { _action, ...values } = Object.fromEntries(data);
-  //Stores the user input in the local storage
+  //Stores the user input in the user array on form submission
   if (_action === "newUser") {
     try {
-      localStorage.setItem("userName", JSON.stringify(values.userName));
+      if(!Budgets.user) {
+        Budgets.user =[];
+      }
+
+      // Add net user to the array
+      Budgets.user.push({ userName: values.userName})
+
+      // Save user to the local storage
+      localStorage.setItem("user", JSON.stringify(values.userName))
+
       return toast.success(`Welcome, ${values.userName}`);
     } catch (e) {
+      console.error("Error adding new user:", e)
       throw new Error("There was a problem creating your account.");
     }
   }
@@ -58,29 +70,46 @@ export async function dashboardAction({ request }) {
   }
 }
 
+
+
 const Dashboard = () => {
   const { userName, budgets, expenses } = useLoaderData();
 
+  // Use React state to manage budgets and expenses dynamically
+  const [budget, setBudget] = useState(budgets);
+  const [expense, setExpense] = useState(expenses);
+
+  const currentUserName = Budgets.user?.[0]?.userName || userName || null ; // Check Budgets.user first, fallback to loader data
+
+  const refreshBudgets = () => {
+    const updatedBudgets = fetchData("budgets") || [];
+    const updatedExpenses = fetchData("expenses") || [];
+    setBudget(updatedBudgets);
+    setExpense(updatedExpenses);
+  };
+
+
   return (
     <>
-      {userName ? (
+      {currentUserName ? (
         <div className="dashboard">
           <h1 className="welcome">
-            Welcome back, <span className="accent">{userName}</span>
+            Welcome, <span className="accent">{currentUserName}.</span>
           </h1>
           <div className="grid-sm">
             {budgets && budgets.length > 0 ? (
               <div className="grid-lg">
                 <div className="flex-lg">
                   <AddBudgetForm />
-                  <AddExpenseForm budgets={budgets} />
+                  <AddExpenseForm budgets={budgets} refreshBudgets={refreshBudgets}/>
                 </div>
                 <h2 className="sectionTitle">Current Budgets</h2>
                 <div className="currentBudgets">
-                  {budgets.map((budgets) => (
-                    <BudgetItem key={budgets.id} budgets={budgets} expenses={expenses}/>
+                  {budgets.map((budgetItem) => (
+                    <BudgetItem key={budgetItem.id} budgets={budgetItem} expenses={expense}/>
                   ))}
                 </div>
+                <Expenses budgets={budget} refreshBudgets={refreshBudgets}/>
               </div>
             ) : (
               <div>

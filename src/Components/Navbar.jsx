@@ -14,21 +14,21 @@ const Navbar = ({userName}) => {
             <i className="fa-solid fa-hand-holding-dollar"></i>
           </NavLink>
           <ul className="nav-menu">
-            <li>
+            {/* <li>
             {userName && (
             <Form method="post" action="/info" onSubmit={{event}}>
               <button type="submit" className="btn btn--info">Budget Types</button>
           </Form>)}
-          </li>
+          </li> */}
           <li>
            {userName && (
               <Form method="post" action="/logout" onSubmit={(event) => {
-                if (!confirm("Delete user and all data?")) {
+                if (!confirm("Log out?")) {
                     event.preventDefault() // Prevents page from deleting and refreshing
                 }
               }}>
                 <button type="submit" className="btn btn--warning">
-                  <span>Delete User</span>
+                  <span>Log out</span>
                 </button>
               </Form>
             )} 
