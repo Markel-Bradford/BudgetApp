@@ -50,7 +50,7 @@ const Signin = () => {
       <div className="welcomeImgContainer">
         <img
           className="welcome-img"
-          src="/images/Budget.png"
+          src="/BudgetApp/images/Budget.png"
           alt="Money"
           align="right"
         />
