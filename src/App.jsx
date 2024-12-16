@@ -39,7 +39,10 @@ const router = createBrowserRouter([
     path: "*",
     element: <Error />    
   }
-])
+],
+{
+  basename: "/BudgetApp", // Set basename to match gh repository
+})
 
 function App() {
   return (
