@@ -1,4 +1,4 @@
-import { Budgets } from "./Data/Budgets";
+const BASE_URL = "http://localhost:5000/api"; // Base URL for backend API
 
 export const wait = () =>
   new Promise((res) => setTimeout(res, Math.random() * 800));
@@ -8,120 +8,135 @@ const generateRandomColor = () => {
   return `${existingBudgetsLength * 34} 65% 50%`;
 };
 
-export const fetchData = (key) => {
-  if (key === "user") return Budgets.user?.[0] || null;
-  if (key === "budgets") return Budgets.data;
-  if (key === "expenses") return Budgets.expenses;
-  return null;
+// Helper to fetch data from backend
+export async function fetchData(endPoint, queryParam = "") {
+  try {
+    // Construct URL dynamically
+    const url = queryParam
+      ? `${BASE_URL}/${endPoint}/${queryParam}`
+      : `${BASE_URL}/${endPoint}`;
+
+    // Fetch data from API
+    const response = await fetch(url);
+
+    // Handle NOK responses
+    if (!response.ok) {
+      throw new Error(
+        `Error fetching data from ${url}: ${response.statusText}`
+      );
+    }
+
+    // Parse and return JSON response
+    return await response.json();
+  } catch (error) {
+    console.error("Fetch error:", error.message);
+    return null;
+  }
+}
+
+// Helper to send data to backend
+async function postData(endPoint, data) {
+  try {
+    const response = await fetch(`${BASE_URL}/${endPoint}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) throw new Error("Error creating data.");
+    return await response.json();
+  } catch (error) {
+    console.error("POST error:", error.message);
+    return null;
+  }
+}
+
+// Helper to delete data from backend
+async function deleteData(endPoint, id) {
+  try {
+    const response = await fetch(`${BASE_URL}/${endPoint}/${id}`, {
+      method: "DELETE",
+    });
+
+    if (!response.ok) throw new Error("Error deleting data.");
+    return await response.json();
+  } catch (error) {
+    console.error("DELETE error:", error.message);
+    return null;
+  }
+}
+
+// Create new user and post on backend
+export const newUser = async ({ userName }) => {
+  const newUser = { userName };
+  const result = await postData("users", newUser);
+  return result;
 };
 
-export const newUser = ({ userName }) => {
-  const newUser = {
-    userName,
-  };
-  Budgets.user = [newUser];
-
-  // Save to local storage for persistence
-  localStorage.setItem("user", JSON.stringify(newUser));
-};
-
-// Create budget. Pass in name and amount, then save to local storage
-export const newBudget = ({ name, amount }) => {
+// Create new budget
+export const newBudget = async ({ name, amount }) => {
   const newItem = {
-    id: crypto.randomUUID(),
-    name: name,
+    name,
     createdAt: Date.now(),
     amount: +amount,
     spent: 0, // Initialize spent amount
     color: generateRandomColor(),
   };
-  Budgets.data.push(newItem);
-
-  // Save to local storage for persistence
-  const storedBudgets = JSON.parse(localStorage.getItem("budgets")) || [];
-  storedBudgets.push(newItem);
-  localStorage.setItem("budgets", JSON.stringify(storedBudgets));
+  const result = await postData("budgets", newItem);
+  return result;
 };
 
-// Function to create a new expense
-export const newExpense = ({ name, amount, budgetsId }, refreshBudgets) => {
+// Create a new expense
+export const newExpense = async (
+  { name, amount, budgetsId },
+  refreshBudgets
+) => {
   const newItem = {
-    id: crypto.randomUUID(),
-    name: name,
+    name,
     createdAt: Date.now(),
     amount: +amount,
-    budgetsId: budgetsId,
+    budgetsId,
   };
-  Budgets.expenses.push(newItem);
-
-  // Update the corresponding budget's spent amount
-  updateSpentAmount(budgetsId);
-
-  // Save to local storage for persistence
-  const storedExpenses = JSON.parse(localStorage.getItem("expenses")) || [];
-  storedExpenses.push(newItem);
-  localStorage.setItem("expenses", JSON.stringify(storedExpenses));
-
-  // Invoke callback to refresh budgets
-  if (refreshBudgets) {
-    refreshBudgets();
-  }
+  const result = await postData("expense", newItem);
+  return result;
 };
 
 // Function to update the spent amount for a specific budget
-export const updateSpentAmount = (budgetId) => {
-  const existingExpenses = fetchData("expenses") ?? [];
-  const budgetExpenses = existingExpenses.filter(
-    (expense) => expense.budgetsId === budgetId
-  );
-  const totalSpent = budgetExpenses.reduce(
+export const updateSpentAmount = async (budgetId) => {
+  const expenses = await fetchData("expenses", budgetId);
+  if (!expenses) return;
+
+  const totalSpent = expenses.reduce(
     (total, expense) => total + expense.amount,
     0
   );
 
-  // Update the specific budget in Budgets.data
-  Budgets.data = Budgets.data.map((budget) =>
-    budget.id === budgetId ? { ...budget, spent: totalSpent } : budget
-  );
-
-  // Sync with localStorage
-  localStorage.setItem("budgets", JSON.stringify(Budgets.data));
+  // Send updates to the backend
+  await postData(`budgets/update-spent`, { budgetId, spent: totalSpent });
 };
 
-
-// Initialize from localStorage
-const storedUser = JSON.parse(localStorage.getItem("user"));
-if (storedUser) {
-  Budgets.user = [storedUser];
-}
-
-const storedBudgets = JSON.parse(localStorage.getItem("budgets"));
-if (storedBudgets) Budgets.data = storedBudgets;
-
-const storedExpenses = JSON.parse(localStorage.getItem("expenses"));
-if (storedExpenses) Budgets.expenses = storedExpenses;
-
 // Delete item
-export const deleteItem = ({ type, id }) => {
-  switch (type) {
-    case "user":
-      Budgets.user = Budgets.user.filter((user) => user.id !== id);
-      localStorage.setItem("user", JSON.stringify(Budgets.user));
-      break;
+export const deleteItem = async ({ type, id }) => {
+  const endPointMap = {
+    user: "users",
+    budgets: "budgets",
+    expenses: "expenses",
+  };
 
-    case "budgets":
-      Budgets.data = Budgets.data.filter((budget) => budget.id !== id);
-      localStorage.setItem("budgets", JSON.stringify(Budgets.data));
-      break;
-
-    case "expenses":
-      Budgets.expenses = Budgets.expenses.filter(
-        (expense) => expense.id !== id
-      ); // Filter properly
-      localStorage.setItem("expenses", JSON.stringify(Budgets.expenses)); // Persist updated expenses
-      break;
-
-    default:
-      console.warn("Invalid type:", type);
+  const endpoint = endPointMap[type];
+  if (!endpoint) {
+    console.warn("Invalid type:", type);
+    return;
   }
+
+  await deleteData(endpoint, id);
+};
+
+// Fetch all necessary data during app initialization
+export const initializeData = async () => {
+  const users = await fetchData("users");
+  const budgets = await fetchData("budgets");
+  const expenses = await fetchData("expenses");
+
+  return { users, budgets, expenses };
 };

@@ -5,14 +5,17 @@ import { newUser } from "../helpers";
 
 const Signin = () => {
   const [usernameInput, setUsernameInput] = useState("");
+  const [emailInput, setEmailInput] = useState("");
 
   const handleFormSubmit = () => {
-    if (usernameInput.trim()) {
-      newUser({userName: usernameInput.trim()});
-      console.log("User created:", usernameInput);
+    if (usernameInput.trim(), emailInput.trim()) {
+      newUser({userName: usernameInput.trim(), email: emailInput.trim()});
+      console.log("User created:", usernameInput, emailInput);
     } else {
       console.log("Please enter a valid username.")
     }
+
+
   }
 
   return (
@@ -40,6 +43,14 @@ const Signin = () => {
             value={usernameInput}
             onChange={(e) => setUsernameInput(e.target.value)} // Update state dunamically
           />
+          <input 
+          type="email"
+          name="email"
+          id="email"
+          required
+          placeholder="john.doe@gmail.com"
+          autoComplete="email"
+          value={(e) => setEmailInput(e.target.value)} />
           <input type="hidden" name="_action" value="newUser" />
           <button type="submit" className="submitbutton">
             Create Account

@@ -1,18 +1,30 @@
+import { useEffect, useState } from "react";
 
 
-const BudgetItem = ({ budgets, expenses }) => {
-  const { id, name, amount, color, spent } = budgets; // Ensure "spent" reflects the latest state
+const BudgetItem = ({ budgetId, expenses }) => {
   
-  // Filter expenses related to this budget
-  const budgetExpenses = expenses.filter(
-    (expense) => expense.budgetsId === budgets.id
-  );
+  const [totalSpent, setTotalSpent] = useState(0); // State to track total spent
+  const { id, name, amount, color } = budgets; // Ensure "spent" reflects the latest state
+  
+  useEffect(() => {
 
-  // Calculate the total spent for this budget
-  const totalSpent = budgetExpenses.reduce(
-    (total, expense) => total + expense.amount,
-    0
-  );
+    // async function to update spent amount
+    const fetchAndUpdateSpent = async () => {
+      try {
+        // Updates the "spent" amount from the backend
+        await updateSpentAmount(budgetId);
+        
+        // Fetch the updated data after updating
+        const updatedExpenses = expenses.filter(exp => exp.budgetId === budgetId);
+        const newTotalSpent = updatedExpenses.reduce((total, exp) => total + exp.amount, 0);
+        setTotalSpent(newTotalSpent)
+      } catch (error) {
+        console.error("Error updating spent amount:", error)
+      }
+    };
+    
+    fetchAndUpdateSpent(); // Call the async function
+  }, [expenses, budgetId]); // Dependencies to trigger the effect
   
   const remaining = amount - totalSpent;
   
