@@ -18,7 +18,7 @@ app.use(cors())
 app.use(express.json()); // Middleware to parse JSON
 
 // Restrict CORS
-const allowedOrigins = ['https://markel-bradford.github.io', 'http://localhost:5173'];
+const allowedOrigins = ['https://markel-bradford.github.io/BudgetApp', 'http://localhost:5173'];
 app.use(cors({
     origin: (origin, callback) => {
         if (!origin || allowedOrigins.includes(origin)) {
