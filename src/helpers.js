@@ -1,4 +1,4 @@
-const BASE_URL = "http://localhost:5000/api"; // Base URL for backend API
+const BASE_URL = "https://budgetapp-37rv.onrender.com/api"; // Base URL for backend API
 
 export const wait = () =>
   new Promise((res) => setTimeout(res, Math.random() * 800));
