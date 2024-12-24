@@ -1,41 +1,62 @@
 import React, { useState, useEffect } from "react";
 import { Budgets } from "../Data/Budgets";
 import { TrashIcon } from "@heroicons/react/24/solid";
-import { deleteItem, fetchData, updateSpentAmount } from "../helpers";
+import { deleteItem, fetchData as fetchDataHelper, updateSpentAmount } from "../helpers";
 
 const Expenses = ({budgets, refreshBudgets}) => {
-  const [budget, setBudget] = useState([]);
+  const [budgetList, setBudgetList] = useState([]);
   const [expenses, setExpenses] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchedBudgets = fetchData("budgets") || [];
-    const fetchedExpenses = fetchData("expenses") || [];
-    setBudget(fetchedBudgets);
-    setExpenses(fetchedExpenses);
+    const fetchAllData = async () => {
+      try {
+        const budgetResponse = await fetch('/api/budgets');
+        const expenseResponse = await fetch('api/expenses');
+        const budgets = await budgetResponse.json();
+        const expenses = await expenseResponse.json()
+        setBudgetList(budgets);
+        setExpenses(expenses)
+    } catch (error) {
+      console.error(error) 
+    } finally {
+      setLoading(false);
+    }
+  }
+   fetchAllData();
   }, []);
 
+
   // Handle deletion of an expense
-  const handleDeleteExpense = (expenseId, budgetId) => {
-    // Delete the expense from wherever it is stored
-    deleteItem({ type: "expenses", id: expenseId });
+  const handleDeleteExpense = async (expenseId, budgetId) => {
+    try
+      {// Delete the expense from wherever it is stored
+        await deleteItem({ type: "expenses", id: expenseId });
 
-    // Recalculate and update the spent amount for the budget
-    updateSpentAmount(budgetId);
+        // Recalculate and update the spent amount for the budget
+        await updateSpentAmount(budgetId);
 
-    // Fetch updated data and set state
-    const updatedBudgets = fetchData("budgets") || [];
-    const updatedExpenses = fetchData("expenses") || [];
-    setBudget(updatedBudgets); // This triggers re-render for all components
-    setExpenses(updatedExpenses); // This triggers re-render of BudgetItem
+        // Fetch updated data and set state
+        const updatedBudgets = await fetchHelperData("budgets") || [];
+        const updatedExpenses = await fetchHelperData("expenses") || [];
+        setBudget(updatedBudgets || []); // This triggers re-render for all components
+        setExpenses(updatedExpenses || []); // This triggers re-render of BudgetItem
 
-    // Refresh budgets and expenses in parent Dashboard
-    refreshBudgets();
+        // Refresh budgets and expenses in parent Dashboard
+        refreshBudgets();
+      } catch (error) {
+        console.error("Error deleting expenses:", error);
+      }
   };
+
+  if (loading) {
+    return <p>Loading budgets and expenses...</p>
+  }
 
   return (
     <div className="budgetList">
       <h2 className="sectionTitle">Budget Expense List</h2>
-      {budget.map((budget) => (
+      {budgetList.map((budget) => (
         <BudgetWithExpenses
           key={budget.id}
           budget={budget}
@@ -57,16 +78,17 @@ const BudgetWithExpenses = ({ budget, expenses, onDeleteExpense }) => {
     0
   );
 
-  const [click, setClick] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
 
-  const handleClick = () => setClick(!click);
+  const toggleExpenseVisibility = () => setIsExpanded(!isExpanded);
 
   return (
     <div className="budgetExpenseList">
-      <h3 className="budgetListName" onClick={handleClick}>
+      <h3 className="budgetListName" onClick={toggleExpenseVisibility}>
         <span>{budget.name}</span>{" "}
         <span>(Spent: ${totalSpent.toFixed(2)})&#9661;</span>
       </h3>
+      { isExpanded && (
       <ul
         className={click ? "expenseList" : "expenseListHidden"}
         >
@@ -79,14 +101,17 @@ const BudgetWithExpenses = ({ budget, expenses, onDeleteExpense }) => {
           />
         ))}
       </ul>
+      )}
     </div>
   );
 };
 
 const ExpenseItem = ({ expense, onDeleteExpense }) => {
   const handleDelete = () => {
-    // Pass the expense id, amount, and budgetID to the callback
-    onDeleteExpense(expense.id, expense.budgetsId); // Call the callback passed from the parent
+    // Confirm item deletion and handle delete
+    if (window.confirm(`Delete expense "${expense.name}"?`)) {
+      onDeleteExpense(expense.id, expense.budgetId)
+    }
   };
 
   return (

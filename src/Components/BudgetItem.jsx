@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 
-const BudgetItem = ({ budgetId, expenses }) => {
+const BudgetItem = ({ budgetId, budgets, expenses }) => {
   
   const [totalSpent, setTotalSpent] = useState(0); // State to track total spent
   const { id, name, amount, color } = budgets; // Ensure "spent" reflects the latest state
@@ -17,6 +17,8 @@ const BudgetItem = ({ budgetId, expenses }) => {
         // Fetch the updated data after updating
         const updatedExpenses = expenses.filter(exp => exp.budgetId === budgetId);
         const newTotalSpent = updatedExpenses.reduce((total, exp) => total + exp.amount, 0);
+        
+        // Update the state with new total spent
         setTotalSpent(newTotalSpent)
       } catch (error) {
         console.error("Error updating spent amount:", error)

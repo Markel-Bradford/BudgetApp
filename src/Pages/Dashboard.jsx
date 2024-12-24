@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useLoaderData, Form } from "react-router-dom";
 import { fetchData, newBudget, wait, newExpense } from "../helpers";
 import Signin from "../Components/Signin";
@@ -27,16 +27,8 @@ export async function dashboardAction({ request }) {
   //Stores the user input in the user array on form submission
   if (_action === "newUser") {
     try {
-      if(!Budgets.user) {
-        Budgets.user =[];
-      }
-
-      // Add net user to the array
-      Budgets.user.push({ userName: values.userName})
-
       // Save user to the local storage
       localStorage.setItem("user", JSON.stringify(values.userName))
-
       return toast.success(`Welcome, ${values.userName}`);
     } catch (e) {
       console.error("Error adding new user:", e)
@@ -47,7 +39,7 @@ export async function dashboardAction({ request }) {
   if (_action === "newBudget") {
     try {
       // Call newBudget function from helpers. Pass values into the function
-      newBudget({
+      await newBudget({
         name: values.newBudget,
         amount: values.newBudgetAmount,
       });
@@ -58,7 +50,7 @@ export async function dashboardAction({ request }) {
   }
   if (_action === "newExpense") {
     try {
-      newExpense({
+      await newExpense({
         name: values.newExpense,
         amount: values.newExpenseAmount,
         budgetsId: values.budgetSelect,
@@ -73,21 +65,24 @@ export async function dashboardAction({ request }) {
 
 
 const Dashboard = () => {
-  const { userName, budgets, expenses } = useLoaderData();
+  const { userName, budgets: initialBudgets, expenses: initialExpenses } = useLoaderData();
 
   // Use React state to manage budgets and expenses dynamically
-  const [budget, setBudget] = useState(budgets);
-  const [expense, setExpense] = useState(expenses);
+  const [budgets, setBudgets] = useState(initialBudgets || []);
+  const [expense, setExpense] = useState(initialExpenses || []);
 
-  const currentUserName = Budgets.user?.[0]?.userName || userName || null ; // Check Budgets.user first, fallback to loader data
+  const currentUserName = userName;
 
   const refreshBudgets = () => {
     const updatedBudgets = fetchData("budgets") || [];
     const updatedExpenses = fetchData("expenses") || [];
-    setBudget(updatedBudgets);
+    setBudgets(updatedBudgets);
     setExpense(updatedExpenses);
   };
-
+  
+  useEffect(() => {
+    refreshBudgets();
+  }, []); // Initial budget refresh on mount
 
   return (
     <>
@@ -97,7 +92,7 @@ const Dashboard = () => {
             Welcome, <span className="accent">{currentUserName}.</span>
           </h1>
           <div className="grid-sm">
-            {budgets && budgets.length > 0 ? (
+            {budgets.length > 0 ? (
               <div className="grid-lg">
                 <div className="flex-lg">
                   <AddBudgetForm />
@@ -109,7 +104,7 @@ const Dashboard = () => {
                     <BudgetItem key={budgetItem.id} budgets={budgetItem} expenses={expense}/>
                   ))}
                 </div>
-                <Expenses budgets={budget} refreshBudgets={refreshBudgets}/>
+                <Expenses budgets={budgets} refreshBudgets={refreshBudgets}/>
               </div>
             ) : (
               <div>
@@ -118,7 +113,7 @@ const Dashboard = () => {
                   <br />
                   Create a new budget to get started!
                 </p>
-                <AddBudgetForm />
+                <AddBudgetForm refreshBudgets={refreshBudgets}/>
               </div>
             )}
           </div>

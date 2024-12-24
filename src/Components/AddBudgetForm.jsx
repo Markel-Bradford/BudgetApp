@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
-import { Form, useFetcher } from "react-router-dom";
+import { useFetcher } from "react-router-dom";
 
-const AddBudgetForm = () => {
+const AddBudgetForm = ({ refreshBudgets }) => {
   const fetcher = useFetcher();
   const isSubmitting = fetcher.state === "submitting";
 
@@ -12,9 +12,14 @@ const AddBudgetForm = () => {
   // If form is not submitting, the form will be reset.
   useEffect(() => {
     if(!isSubmitting) {
+      //clear form
       formRef.current.reset()
+      if (refreshBudgets) {
+        refreshBudgets() // Notify parent to refresh budgets and expenses
+      }
     }
-  }, [isSubmitting]);
+  }, //reset focus 
+  [isSubmitting, refreshBudgets]);
 
   return (
     <div className="form-wrapper">

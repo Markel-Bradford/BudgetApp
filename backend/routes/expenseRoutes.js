@@ -4,7 +4,7 @@ const Expense = require('../models/Expense');
 
 router.get('/:budgetId', async (req, res) => {
     try {
-        const expenses = await Expense.find({ budgetsId: req.params.budgetId});
+        const expenses = await Expense.find({ budgetId: req.params.budgetId});
         res.json(expenses)
     } catch (error) {
         res.status(500).json({error: error.message});

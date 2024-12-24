@@ -50,7 +50,7 @@ const Signin = () => {
           required
           placeholder="john.doe@gmail.com"
           autoComplete="email"
-          value={(e) => setEmailInput(e.target.value)} />
+          onChange={(e) => setEmailInput(e.target.value)} />
           <input type="hidden" name="_action" value="newUser" />
           <button type="submit" className="submitbutton">
             Create Account

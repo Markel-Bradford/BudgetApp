@@ -12,19 +12,25 @@ import { fetchData } from "../helpers";
 // loader
 export async function mainLoader() {
   try {
-  const userId = localStorage.getItem("userId") || null;
+  localStorage.setItem("userId", user.id); // Save the user ID returned from the backend
   const budgetId = null; // Adjust or retrieve dynamically from route or state
 
   // Attempt to fetch the data from backend
   const userData = userId ? await fetchData("users", userId) : null; // Calls `/api/users/:userId`
   const budgets = await fetchData("budgets") // Calls `/api/budgets/`
-  const budgetDetails = await fetchData("budgets", budgetId); // Calls `/api/budgets/:budgetId`
-  const expenses = await fetchData("expenses", budgetId); // Calls `/api/expenses/:budgetId`
-  
+  const expenses = budgets.length // Calls `/api/expenses/:budgetId`
+    ? await Promise.all(
+      budgets.map((budget) => fetchData("expenses", budget.id))
+    ) : [];
+
+  // Combine all expenses
+  const flattendExpenses = expenses.flat();
+
+
   // Fallback to Budgets.user if localStorage is not popluated
   const currentUserName = userData?.name || "Guest";
 
-  return { currentUserName, budgets, budgetDetails, expenses };
+  return { currentUserName, budgets, expenses: flattendExpenses };
 } catch (error) {
   console.error("Error loading data:", error);
   return {currentUserName: "Guest", budgets: [], expenses: []};
@@ -32,14 +38,14 @@ export async function mainLoader() {
 }
 
 const Main = () => {
-  const { currentUserName } = useLoaderData();
+  const { currentUserName, budgets, expenses } = useLoaderData();
 
 
   return (
     <div className="layout">
       <Navbar userName={ currentUserName }/>
       <main>
-        <Outlet context={{budgets, budgetDetails, expenses}}/>
+        <Outlet context={{budgets, expenses}}/>
         </main>
     </div>
   );
