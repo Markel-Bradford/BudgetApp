@@ -34,15 +34,6 @@ app.use('/api/users', userRoutes);
 app.use('/api/budgets', budgetRoutes);
 app.use('/api/expenses', expenseRoutes);
 
-// Serve frontend
-if (process.env.NODE_ENV === 'production') {
-    const frontendPath = path.join(__dirname, '..', 'BudgetApp', 'dist');
-    app.use(express.static(frontendPath));
-    app.get('*', (req, res) =>
-        res.sendFile(path.resolve(frontendPath, 'index.html'))
-    );
-}
-
 // Middleware to handle errors
 app.use((err, req, res, next) => {
     const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
