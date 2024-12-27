@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Form } from "react-router-dom";
-import { UserPlusIcon } from "@heroicons/react/24/solid";
+import { ArrowRightEndOnRectangleIcon, UserPlusIcon } from "@heroicons/react/24/solid";
 import { newUser } from "../helpers";
 
 const Signin = () => {
   const [usernameInput, setUsernameInput] = useState("");
   const [emailInput, setEmailInput] = useState("");
 
-  const handleFormSubmit = () => {
+  const handleCreateAccount = () => {
     if (usernameInput.trim(), emailInput.trim()) {
       newUser({name: usernameInput.trim(), email: emailInput.trim()});
       console.log("User created:", usernameInput, emailInput);
@@ -31,7 +31,7 @@ const Signin = () => {
           <li>e</li>
           <li>!</li>
         </ul>
-        <Form className="signInForm" method="POST" onSubmit={handleFormSubmit}>
+        <Form className="signInForm" method="POST" onSubmit={handleCreateAccount}>
           <h2 id="welcomeMessage">Sign in and let's get started!</h2>
           <input
             type="text"
@@ -53,10 +53,16 @@ const Signin = () => {
           value={emailInput}
           onChange={(e) => setEmailInput(e.target.value)} />
           <input type="hidden" name="_action" value="newUser" />
-          <button type="submit" className="submitbutton">
+          <div className="btncontainer">
+          <button type="submit" className="submitbutton" >
             Create Account
             <UserPlusIcon width={20} />
           </button>
+          <button type="submit" className="submitbutton signin">
+            Sign In
+            <ArrowRightEndOnRectangleIcon width={20} />
+          </button>
+          </div>
         </Form>
       </div>
       <div className="welcomeImgContainer">

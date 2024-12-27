@@ -438,6 +438,14 @@ main {
   color: black;
 }
 
+.btncontainer {
+  display: flex;
+  justify-content: space-around;
+  width: 100%;
+}
+
+
+
 .submitbutton {
   width: 60%;
   display: block;
@@ -459,6 +467,9 @@ main {
   padding: 15px;
 }
 
+.signin {
+  padding: 15px 30px;
+}
 .submitbutton:hover {
   border: 3px solid #0a536d;
 }
