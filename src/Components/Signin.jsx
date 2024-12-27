@@ -9,7 +9,7 @@ const Signin = () => {
 
   const handleFormSubmit = () => {
     if (usernameInput.trim(), emailInput.trim()) {
-      newUser({userName: usernameInput.trim(), email: emailInput.trim()});
+      newUser({name: usernameInput.trim(), email: emailInput.trim()});
       console.log("User created:", usernameInput, emailInput);
     } else {
       console.log("Please enter a valid username.")

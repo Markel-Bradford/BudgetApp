@@ -3,7 +3,7 @@ import { Form, NavLink } from "react-router-dom";
 
 
 
-const Navbar = ({userName}) => {
+const Navbar = ({currentUserName}) => {
   
   return (
     <>
@@ -21,7 +21,7 @@ const Navbar = ({userName}) => {
           </Form>)}
           </li> */}
           <li>
-           {userName && (
+           {currentUserName && (
               <Form method="post" action="/logout" onSubmit={(event) => {
                 if (!confirm("Log out?")) {
                     event.preventDefault() // Prevents page from deleting and refreshing

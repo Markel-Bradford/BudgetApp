@@ -30,8 +30,8 @@ export const fetchData = async (endpoint) => {
  */
 export const newUser = async (user) => {
   try {
-    await axios.post(`${BASE_URL}users`, user);
-    localStorage.setItem(user, "userId")
+    await axios.post(`${BASE_URL}users/register`, user);
+    localStorage.setItem( response.data.id)
     toast.success("User created successfully!");
     
   } catch (error) {
