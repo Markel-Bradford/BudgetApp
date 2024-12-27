@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
  * Log the user out by deleting session data and redirecting.
  * @returns {Promise} Redirects to the home page after logout.
  */
-export function logoutAction() {
+export async function logoutAction() {
     try {
         // Delete the user session data (e.g., userId or auth token)
         deleteItem({
@@ -15,12 +15,15 @@ export function logoutAction() {
 
         // Display success toast notification
         toast.success("You've successfully logged out!");
-
-        // Redirect to home or login page after logging out
-        return redirect("/");
+        
+        // Hard reload after redirect to ensure all client-side state resets
+        setTimeout(() => {
+            window.location.href = "/"; // Replace with your base path
+        }, 200); // Delay to allow toast to display
+        return redirect("/")
     } catch (error) {
         console.error("Error logging out:", error);
         toast.error("Logout failed. Please try again.");
-        return redirect("/dashboard"); // Stay on the dashboard in case of error
+        return redirect("/"); // Stay on the dashboard in case of error
     }
 }

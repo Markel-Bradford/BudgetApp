@@ -1,7 +1,7 @@
 import React from "react";
 
 // rrd imports
-import { useLoaderData, Outlet } from "react-router-dom";
+import { useLoaderData, Outlet, Navigate } from "react-router-dom";
 
 // UI imports
 import Navbar from "../Components/Navbar";
@@ -18,7 +18,10 @@ export async function mainLoader() {
   try {
     // Fetch the current user data from localStorage
     const userId = localStorage.getItem("userId");  // Assuming userId is stored in localStorage
-    if (!userId) throw new Error("User is not logged in.");
+    // If not logged in, redirect to the sign-in screen
+  if (!userId) {
+    return <Navigate to="/signin" replace />;
+  }
 
     const currentUserName = userId ? await fetchData(`users/${userId}`) : null;  // Fetch the user data if userId is available
     

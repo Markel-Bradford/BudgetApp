@@ -3,59 +3,61 @@ import { Form, useFetcher } from "react-router-dom";
 import { ArrowRightEndOnRectangleIcon, UserPlusIcon } from "@heroicons/react/24/solid";
 import { newUser } from "../helpers";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 const Signin = () => {
   const [usernameInput, setUsernameInput] = useState("");
   const [emailInput, setEmailInput] = useState("");
-  const fetcher = useFetcher();
-    const isSubmitting = fetcher.state === "submitting";
-  
-    const formRef = useRef();
-    const focusRef = useRef();
-  
-  
-    // If form is not submitting, the form will be reset.
-    useEffect(() => {
-      if(!isSubmitting) {
-        //clear form
-        formRef.current.reset()
-      }
-    }, //reset focus 
-    [isSubmitting]);
 
-  const handleCreateAccount = async () => {
-    if (usernameInput.trim(), emailInput.trim()) {
-      newUser({name: usernameInput.trim(), email: emailInput.trim()});
-      console.log("User created:", usernameInput, emailInput);
-    } else {
-      console.log("Please enter a valid username.")
-    }
-  }
 
-  const handleSignin = async () => {
+  const handleFormSubmit = async (e) => {
+    const action = e.nativeEvent.submitter.getAttribute("data-action");
 
     if (!usernameInput.trim() || !emailInput.trim()) {
-      toast.error("Name and email required.")
-      console.log("Please enter a name and email.")
-      return
+      toast.error("Name and email are required.");
+      return;
     }
 
-    try {
-      // Check if user exists
-      const response = await axios.get("https://budgetapp-37rv.onrender.com/api/users/login", {
-        params: {name: usernameInput.trim(), email: emailInput.trim() },
-      });
-
-      console.log("User logged in:", response.data)
-      localStorage.setItem("userId", response.data._id)
-    } catch (error) {
-      if (error.response && error.response.status === 404) {
-        toast.error("User not found. Please create an account.");
-      } else {
-        console.log("An error occurred. Please try again.");
+    if (action === "create") {
+      // Handle create account
+      try {
+        if (usernameInput.trim(), emailInput.trim()) {
+          newUser({name: usernameInput.trim(), email: emailInput.trim()});
+          console.log("User created:", usernameInput, emailInput);
+        } else {
+          console.error("Error signing in:", error);
+          toast.error("Sign-in failed. Please try again.");
+        }
+      } catch (error) {
+        console.error("Error creating account:", error);
+        toast.error("Failed to create account. Please try again.");
+      }
+    } else if (action === "signin") {
+      if (!usernameInput.trim() || !emailInput.trim()) {
+        toast.error("Name and email required.")
+        console.log("Please enter a name and email.")
+        return
+      }
+  
+      // Handle sign in
+      try {
+        // Check if user exists
+        const response = await axios.get("https://budgetapp-37rv.onrender.com/api/users/login", {
+          params: { name: usernameInput.trim(), email: emailInput.trim() },
+        });
+        localStorage.setItem("userId", response.data._id);
+        toast.success("Signed in successfully!");
+        console.log("User logged in:", response.data);
+      } catch (error) {
+        if (error.response && error.response.status === 404) {
+          toast.error("User not found. Please create an account.");
+        } else {
+          console.error("Error signing in:", error);
+          toast.error("Sign-in failed. Please try again.");
+        }
       }
     }
-  }
+  };
 
   return (
     <div className="container">
@@ -70,7 +72,7 @@ const Signin = () => {
           <li>e</li>
           <li>!</li>
         </ul>
-        <Form className="signInForm" method="POST" onSubmit={handleSignin} ref={formRef}>
+        <Form className="signInForm" method="POST" onSubmit={handleFormSubmit}>
           <h2 id="welcomeMessage">Sign in and let's get started!</h2>
           <input
             type="text"
@@ -81,7 +83,6 @@ const Signin = () => {
             autoComplete="given-name"
             value={usernameInput}
             onChange={(e) => setUsernameInput(e.target.value)} // Update state dunamically
-            ref={focusRef}
           />
           <input 
           type="email"
@@ -94,11 +95,11 @@ const Signin = () => {
           onChange={(e) => setEmailInput(e.target.value)} />
           <input type="hidden" name="_action" value="newUser" />
           <div className="btncontainer">
-          <button type="submit" className="submitbutton" onClick={handleCreateAccount}>
+          <button type="submit" className="submitbutton" data-action="create">
             Create Account
             <UserPlusIcon width={20} />
           </button>
-          <button type="submit" className="submitbutton signin">
+          <button type="submit" className="submitbutton signin" data-action="signin">
             Sign In
             <ArrowRightEndOnRectangleIcon width={20} />
           </button>

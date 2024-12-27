@@ -49,8 +49,17 @@ router.get('/login', async (req, res) => {
     if (!name || !email) {
         return res.status(400).json({error: 'Name and email are required.'})
     }
+
+    const isValidEmail = (email) =>
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     
+    if (!isValidEmail(email)) {
+        return res.status(400).json({ error: "Invalid email format." });
+    }
+        
     try {
+        console.log("Login attempt:", { name, email }); // Log the input data
+
         // Find user by query of name and email
         const user = await User.findOne({name, email});
 
@@ -66,6 +75,7 @@ router.get('/login', async (req, res) => {
             email: user.email,
         });
     } catch (error) {
+        console.error("Error during login:", error); // Log full error details
         res.status(500).json({error: error.message});
     }
 })
