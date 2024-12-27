@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Form } from "react-router-dom";
+import React, { useEffect, useRef, useState } from "react";
+import { Form, useFetcher } from "react-router-dom";
 import { ArrowRightEndOnRectangleIcon, UserPlusIcon } from "@heroicons/react/24/solid";
 import { newUser } from "../helpers";
 import axios from "axios";
@@ -7,8 +7,23 @@ import axios from "axios";
 const Signin = () => {
   const [usernameInput, setUsernameInput] = useState("");
   const [emailInput, setEmailInput] = useState("");
+  const fetcher = useFetcher();
+    const isSubmitting = fetcher.state === "submitting";
+  
+    const formRef = useRef();
+    const focusRef = useRef();
+  
+  
+    // If form is not submitting, the form will be reset.
+    useEffect(() => {
+      if(!isSubmitting) {
+        //clear form
+        formRef.current.reset()
+      }
+    }, //reset focus 
+    [isSubmitting]);
 
-  const handleCreateAccount = () => {
+  const handleCreateAccount = async () => {
     if (usernameInput.trim(), emailInput.trim()) {
       newUser({name: usernameInput.trim(), email: emailInput.trim()});
       console.log("User created:", usernameInput, emailInput);
@@ -17,8 +32,7 @@ const Signin = () => {
     }
   }
 
-  const handleSignin = async (e) => {
-    e.preventDefault();
+  const handleSignin = async () => {
 
     if (!usernameInput.trim() || !emailInput.trim()) {
       toast.error("Name and email required.")
@@ -56,7 +70,7 @@ const Signin = () => {
           <li>e</li>
           <li>!</li>
         </ul>
-        <Form className="signInForm" method="POST" onSubmit={handleSignin}>
+        <Form className="signInForm" method="POST" onSubmit={handleSignin} ref={formRef}>
           <h2 id="welcomeMessage">Sign in and let's get started!</h2>
           <input
             type="text"
@@ -67,6 +81,7 @@ const Signin = () => {
             autoComplete="given-name"
             value={usernameInput}
             onChange={(e) => setUsernameInput(e.target.value)} // Update state dunamically
+            ref={focusRef}
           />
           <input 
           type="email"

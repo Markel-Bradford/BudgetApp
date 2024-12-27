@@ -30,10 +30,9 @@ export const fetchData = async (endpoint) => {
 export const newUser = async (user) => {
   try {
     const response = await axios.post(`${BASE_URL}users/register`, user);
-    console.log(response.data)
-    localStorage.setItem("userId", response.data._id)
+    console.log(response.data);
+    localStorage.setItem("userId", response.data._id);
     toast.success("User created successfully!");
-    
   } catch (error) {
     console.error("Error creating user:", error);
     toast.error("Failed to create user. Please try again.");
@@ -75,13 +74,18 @@ export const newExpense = async (expense) => {
  * @param {object} params - The parameters including type (budgets/expenses) and id of the item.
  * @returns {Promise<void>}
  */
-export const deleteItem = async ({ type, _id }) => {
+export const deleteItem = async ({ type, id }) => {
   try {
-    await axios.delete(`${BASE_URL}${type}/${_id}`);
-    localStorage.removeItem("userId")
-    toast.success("Item deleted successfully!");
+    if (type === "user") {
+      // Remove userId from local storage to logout
+      localStorage.removeItem("userId");
+    } else {
+      // Delete items from database
+      await axios.delete(`${BASE_URL}${type}/${id}`);
+      toast.success("Item deleted successfully!");
+    }
   } catch (error) {
-    console.error(`Error deleting ${type} with id ${_id}:`, error);
+    console.error(`Error deleting ${type} with id ${id}:`, error);
     toast.error("Failed to delete item. Please try again.");
   }
 };
@@ -94,7 +98,10 @@ export const deleteItem = async ({ type, _id }) => {
 export const updateSpentAmount = async (budgetId) => {
   try {
     const expenses = await fetchData(`expenses?budgetId=${budgetId}`);
-    const totalSpent = expenses.reduce((sum, expense) => sum + expense.amount, 0);
+    const totalSpent = expenses.reduce(
+      (sum, expense) => sum + expense.amount,
+      0
+    );
 
     await axios.patch(`${BASE_URL}budgets/${budgetId}`, { spent: totalSpent });
     toast.info("Spent amount updated!");
@@ -122,7 +129,13 @@ export const formatCurrency = (amount) => {
  */
 export const getRandomColor = () => {
   const colors = [
-    "#FF5733", "#33FF57", "#3357FF", "#F3FF33", "#33FFF3", "#FF33F3", "#F333FF"
+    "#FF5733",
+    "#33FF57",
+    "#3357FF",
+    "#F3FF33",
+    "#33FFF3",
+    "#FF33F3",
+    "#F333FF",
   ];
   return colors[Math.floor(Math.random() * colors.length)];
 };
@@ -133,7 +146,11 @@ export const getRandomColor = () => {
  * @returns {boolean} - True if valid, false otherwise.
  */
 export const validateInput = (input) => {
-  if (!input.name || typeof input.name !== "string" || input.name.trim() === "") {
+  if (
+    !input.name ||
+    typeof input.name !== "string" ||
+    input.name.trim() === ""
+  ) {
     toast.error("Invalid name. Please provide a valid name.");
     return false;
   }

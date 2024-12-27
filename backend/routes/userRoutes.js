@@ -20,6 +20,7 @@ router.post('/register', async (req, res) => {
     }
 });
 
+// Get user information
 router.get('/:userId', async (req, res) => {
     try {
         const user = await User.findById(req.params.userId)
@@ -40,6 +41,7 @@ router.get('/:userId', async (req, res) => {
     }
 })
 
+// Sign in by name and email query
 router.get('/login', async (req, res) => {
     const {name, email} = req.query;
 
@@ -49,6 +51,7 @@ router.get('/login', async (req, res) => {
     }
     
     try {
+        // Find user by query of name and email
         const user = await User.findOne({name, email});
 
         // If user not found, return 404
