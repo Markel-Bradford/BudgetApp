@@ -20,25 +20,25 @@ router.post('/register', async (req, res) => {
     }
 });
 
-router.get('/:userId', async (req, res) => {
-    try {
-        const user = await User.findById(req.params.userId)
-        res.json(user);
+// router.get('/:userId', async (req, res) => {
+//     try {
+//         const user = await User.findById(req.params.userId)
+//         res.json(user);
 
-        // If user not found, return 404
-        if (!user) {
-            return res.status(404).json({ error: 'User not found.' });
-        }
+//         // If user not found, return 404
+//         if (!user) {
+//             return res.status(404).json({ error: 'User not found.' });
+//         }
 
-        // Respond with user details
-        res.json({
-            id: user._id,
-            name: user.name,
-            email: user.email,
-        });
-    } catch (error) {
-        res.status(500).json({error: error.message});
-    }
-})
+//         // Respond with user details
+//         res.json({
+//             id: user._id,
+//             name: user.name,
+//             email: user.email,
+//         });
+//     } catch (error) {
+//         res.status(500).json({error: error.message});
+//     }
+// })
 
 module.exports = router;
