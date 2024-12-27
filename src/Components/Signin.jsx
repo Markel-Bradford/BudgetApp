@@ -43,7 +43,7 @@ const Signin = () => {
       try {
         // Check if user exists
         if (usernameInput.trim(), emailInput.trim()) {
-          loginUser({name: usernameInput.trim(), email: emailInput.trim()});
+          await loginUser({name: usernameInput.trim(), email: emailInput.trim()});
         }
       } catch (error) {
         if (error.response && error.response.status === 404) {
