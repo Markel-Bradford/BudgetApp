@@ -30,8 +30,9 @@ export const fetchData = async (endpoint) => {
  */
 export const newUser = async (user) => {
   try {
-    await axios.post(`${BASE_URL}users/register`, user);
-    localStorage.setItem( response.data.id)
+    const response = await axios.post(`${BASE_URL}users/register`, user);
+    console.log(response.data)
+    localStorage.setItem("userId", response.data._id)
     toast.success("User created successfully!");
     
   } catch (error) {
@@ -47,7 +48,7 @@ export const newUser = async (user) => {
  */
 export const newBudget = async (budget) => {
   try {
-    await axios.post(`${BASE_URL}budgets`, budget);
+    await axios.post(`${BASE_URL}`, budget);
     toast.success("Budget created successfully!");
   } catch (error) {
     console.error("Error creating budget:", error);
@@ -62,7 +63,7 @@ export const newBudget = async (budget) => {
  */
 export const newExpense = async (expense) => {
   try {
-    await axios.post(`${BASE_URL}expenses`, expense);
+    await axios.post(`${BASE_URL}`, expense);
     toast.success("Expense added successfully!");
   } catch (error) {
     console.error("Error creating expense:", error);
