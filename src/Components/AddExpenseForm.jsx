@@ -60,7 +60,7 @@ const AddExpenseForm = ({budgets, refreshBudgets}) => {
             <label htmlFor="budgetSelect">Budget</label>
             <select name="budgetSelect" id="budgetSelect" required>
                 {budgets.sort((a,b) => a.createdAt - b.createdAt).map((budgets) => { return (
-                    <option key={budgets.id} value={budgets.id}>{budgets.name}</option>
+                    <option key={budgets._id} value={budgets._id}>{budgets.name}</option>
                     )}
                   )
                 }

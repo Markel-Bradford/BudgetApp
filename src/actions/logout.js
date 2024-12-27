@@ -18,7 +18,7 @@ export async function logoutAction() {
         
         // Hard reload after redirect to ensure all client-side state resets
         setTimeout(() => {
-            window.location.href = "/"; // Replace with your base path
+            window.location.href = "/BudgetApp"; // Replace with your base path
         }, 200); // Delay to allow toast to display
         return redirect("/")
     } catch (error) {

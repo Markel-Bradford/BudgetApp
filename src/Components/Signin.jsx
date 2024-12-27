@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Form, useFetcher } from "react-router-dom";
+import { Form, useFetcher, useNavigate } from "react-router-dom";
 import { ArrowRightEndOnRectangleIcon, UserPlusIcon } from "@heroicons/react/24/solid";
 import { loginUser, newUser } from "../helpers";
 import axios from "axios";
@@ -8,7 +8,7 @@ import { toast } from "react-toastify";
 const Signin = () => {
   const [usernameInput, setUsernameInput] = useState("");
   const [emailInput, setEmailInput] = useState("");
-
+  const navigate = useNavigate();
 
   const handleFormSubmit = async (e) => {
     const action = e.nativeEvent.submitter.getAttribute("data-action");
@@ -23,6 +23,7 @@ const Signin = () => {
       try {
         if (usernameInput.trim(), emailInput.trim()) {
           newUser({name: usernameInput.trim(), email: emailInput.trim()});
+          navigate("/"); // Redirect to dashboard
           console.log("User created:", usernameInput, emailInput);
         } else {
           console.error("Error signing in:", error);
@@ -44,6 +45,7 @@ const Signin = () => {
         // Check if user exists
         if (usernameInput.trim(), emailInput.trim()) {
           await loginUser({name: usernameInput.trim(), email: emailInput.trim()});
+          navigate("/"); // Redirect to dashboard
         }
       } catch (error) {
         if (error.response && error.response.status === 404) {

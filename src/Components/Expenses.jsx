@@ -18,7 +18,7 @@ const Expenses = ({ budgets, refreshData }) => {
       <h2 className="sectionTitle">Budget Expense List</h2>
       {budgets.map((budget) => (
         <BudgetWithExpenses
-          key={budget.id}
+          key={budget._id}
           budget={budget}
           refreshData={refreshData}
           onDeleteExpense={handleDeleteExpense}
@@ -41,9 +41,9 @@ const BudgetWithExpenses = ({ budget, refreshData, onDeleteExpense }) => {
         <ul className="expenseList">
           {budget.expenses.map((expense) => (
             <ExpenseItem
-              key={expense.id}
+              key={expense._id}
               expense={expense}
-              budgetId={budget.id}
+              budgetId={budget._id}
               onDeleteExpense={onDeleteExpense}
             />
           ))}

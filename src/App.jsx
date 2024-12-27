@@ -13,8 +13,6 @@ import { logoutAction } from "./actions/logout";
 import {ToastContainer} from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import Dashboard from "./Pages/Dashboard";
-import { useState } from "react";
-import Signin from "./Components/Signin";
 
 
 
@@ -34,11 +32,6 @@ const router = createBrowserRouter([
       action: logoutAction
     }
     ]
-  },
-  {
-    path: "/signin",
-    element: <Signin />
-
   },
   {
     path: "*",

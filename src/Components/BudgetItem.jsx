@@ -2,14 +2,14 @@ import React, { useEffect, useState } from "react";
 import { updateSpentAmount } from "../helpers";
 
 const BudgetItem = ({ budget, expenses, refreshData }) => {
-  const { id, name, amount, color } = budget;
+  const { _id, name, amount, color } = budget;
   const [totalSpent, setTotalSpent] = useState(0);
 
   useEffect(() => {
     const calculateSpent = async () => {
       try {
         const updatedSpent = expenses.reduce((total, expense) => total + expense.amount, 0);
-        await updateSpentAmount(id); // Ensure backend sync
+        await updateSpentAmount(_id); // Ensure backend sync
         setTotalSpent(updatedSpent);
       } catch (error) {
         console.error("Error updating spent amount:", error);
@@ -17,7 +17,7 @@ const BudgetItem = ({ budget, expenses, refreshData }) => {
     };
 
     calculateSpent();
-  }, [expenses, id]);
+  }, [expenses, _id]);
 
   const remaining = amount - totalSpent;
 

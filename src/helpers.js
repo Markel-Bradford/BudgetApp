@@ -67,8 +67,10 @@ export const loginUser = async (user) => {
  */
 export const newBudget = async (budget) => {
   try {
-    await axios.post(`${BASE_URL}`, budget);
+    const response = await axios.post(`${BASE_URL}/budgets`, budget);
+    console.log(response.data)
     toast.success("Budget created successfully!");
+    return response
   } catch (error) {
     console.error("Error creating budget:", error);
     toast.error("Failed to create budget. Please try again.");
@@ -116,15 +118,15 @@ export const deleteItem = async ({ type, id }) => {
  * @param {string} budgetId - The ID of the budget to update.
  * @returns {Promise<void>}
  */
-export const updateSpentAmount = async (budgetId) => {
+export const updateSpentAmount = async (budgetsId) => {
   try {
-    const expenses = await fetchData(`expenses?budgetId=${budgetId}`);
+    const expenses = await fetchData(`expenses/${budgetsId}`);
     const totalSpent = expenses.reduce(
       (sum, expense) => sum + expense.amount,
       0
     );
 
-    await axios.patch(`${BASE_URL}budgets/${budgetId}`, { spent: totalSpent });
+    await axios.patch(`${BASE_URL}/${budgetsId}`, { spent: totalSpent });
     toast.info("Spent amount updated!");
   } catch (error) {
     console.error("Error updating spent amount:", error);
