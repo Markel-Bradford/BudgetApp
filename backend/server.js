@@ -18,9 +18,6 @@ console.log(connectDB)
 const app = express();
 app.use(cors())
 
-// Middleware to parse JSON
-app.use(express.json()); 
-
 // Restrict CORS
 const allowedOrigins = [
     'https://markel-bradford.github.io',
@@ -40,6 +37,9 @@ app.use(cors({
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Specify allowed HTTP methods
     credentials: true, // Allow credentials (e.g., cookies, authorization headers)
 }));
+
+// Middleware to parse JSON
+app.use(express.json()); 
 
 // API Routes
 app.use('/api/users', userRoutes);
