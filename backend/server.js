@@ -18,13 +18,19 @@ app.use(cors())
 app.use(express.json()); // Middleware to parse JSON
 
 // Restrict CORS
-const allowedOrigins = ['https://markel-bradford.github.io/BudgetApp', 'http://localhost:5173'];
+const allowedOrigins = [
+    'https://markel-bradford.github.io',
+    'http://localhost:5173'
+];
+
 app.use(cors({
     origin: (origin, callback) => {
+        // Allow requests with no origin (like mobile apps, Postman, etc.)
         if (!origin || allowedOrigins.includes(origin)) {
             callback(null, true);
         } else {
-            callback(new Error('Not allowed by CORS'));
+            console.error(`Blocked by CORS: Origin ${origin}`);
+            callback(new Error(`CORS Error: Origin ${origin} is not allowed`));
         }
     },
 }));

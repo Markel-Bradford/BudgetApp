@@ -1,142 +1,144 @@
-const BASE_URL = "https://budgetapp-37rv.onrender.com/api"; // Base URL for backend API
+// helpers.js
 
-export const wait = () =>
-  new Promise((res) => setTimeout(res, Math.random() * 800));
+// Import necessary libraries
+import axios from "axios"; // Switched to Axios for improved error handling and cleaner API calls
+import { toast } from "react-toastify";
 
-const generateRandomColor = () => {
-  const existingBudgetsLength = fetchData("budgets")?.length ?? 0;
-  return `${existingBudgetsLength * 34} 65% 50%`;
-};
+// Constants
+const BASE_URL = "https://budgetapp-37rv.onrender.com/api/"; // Base URL for API calls (modify as needed)
 
-// Helper to fetch data from backend
-export async function fetchData(endPoint, queryParam = "") {
+/**
+ * Fetch data from the API.
+ * @param {string} endpoint - The endpoint to fetch data from (e.g., "budgets" or "expenses").
+ * @returns {Promise<any>} - The fetched data or null if an error occurs.
+ */
+export const fetchData = async (endpoint) => {
   try {
-    // Construct URL dynamically
-    const url = queryParam
-      ? `${BASE_URL}/${endPoint}/${queryParam}`
-      : `${BASE_URL}/${endPoint}`;
-
-    // Fetch data from API
-    const response = await fetch(url);
-
-    // Handle NOK responses
-    if (!response.ok) {
-      throw new Error(
-        `Error fetching data from ${url}: ${response.statusText}`
-      );
-    }
-
-    // Parse and return JSON response
-    return await response.json();
+    const response = await axios.get(`${BASE_URL}${endpoint}`);
+    return response.data;
   } catch (error) {
-    console.error("Fetch error:", error.message);
+    console.error(`Error fetching data from ${endpoint}:`, error);
+    toast.error(`Failed to fetch ${endpoint}. Please try again.`);
     return null;
   }
-}
+};
 
-// Helper to send data to backend
-async function postData(endPoint, data) {
+/**
+ * Create a new user.
+ * @param {object} user - The user data to be created.
+ * @returns {Promise<void>}
+ */
+export const newUser = async (user) => {
   try {
-    const response = await fetch(`${BASE_URL}/${endPoint}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    });
-
-    if (!response.ok) throw new Error("Error creating data.");
-    return await response.json();
+    await axios.post(`${BASE_URL}users`, user);
+    localStorage.setItem(user, "userId")
+    toast.success("User created successfully!");
+    
   } catch (error) {
-    console.error("POST error:", error.message);
-    return null;
+    console.error("Error creating user:", error);
+    toast.error("Failed to create user. Please try again.");
   }
-}
+};
 
-// Helper to delete data from backend
-async function deleteData(endPoint, id) {
+/**
+ * Create a new budget.
+ * @param {object} budget - The budget data to be created.
+ * @returns {Promise<void>}
+ */
+export const newBudget = async (budget) => {
   try {
-    const response = await fetch(`${BASE_URL}/${endPoint}/${id}`, {
-      method: "DELETE",
-    });
-
-    if (!response.ok) throw new Error("Error deleting data.");
-    return await response.json();
+    await axios.post(`${BASE_URL}budgets`, budget);
+    toast.success("Budget created successfully!");
   } catch (error) {
-    console.error("DELETE error:", error.message);
-    return null;
+    console.error("Error creating budget:", error);
+    toast.error("Failed to create budget. Please try again.");
   }
-}
-
-// Create new user and post on backend
-export const newUser = async ({ userName }) => {
-  const newUser = { userName };
-  const result = await postData("users", newUser);
-  return result;
 };
 
-// Create new budget
-export const newBudget = async ({ name, amount }) => {
-  const newItem = {
-    name,
-    createdAt: Date.now(),
-    amount: +amount,
-    spent: 0, // Initialize spent amount
-    color: generateRandomColor(),
-  };
-  const result = await postData("budgets", newItem);
-  return result;
+/**
+ * Create a new expense.
+ * @param {object} expense - The expense data to be created.
+ * @returns {Promise<void>}
+ */
+export const newExpense = async (expense) => {
+  try {
+    await axios.post(`${BASE_URL}expenses`, expense);
+    toast.success("Expense added successfully!");
+  } catch (error) {
+    console.error("Error creating expense:", error);
+    toast.error("Failed to add expense. Please try again.");
+  }
 };
 
-// Create a new expense
-export const newExpense = async (
-  { name, amount, budgetsId },
-  refreshBudgets
-) => {
-  const newItem = {
-    name,
-    createdAt: Date.now(),
-    amount: +amount,
-    budgetsId,
-  };
-  const result = await postData("expense", newItem);
-  return result;
-};
-
-// Function to update the spent amount for a specific budget
-export const updateSpentAmount = async (budgetId) => {
-  const expenses = await fetchData("expenses", budgetId);
-  if (!expenses) return;
-
-  const totalSpent = expenses.reduce(
-    (total, expense) => total + expense.amount,
-    0
-  );
-
-  // Send updates to the backend
-  await postData(`budgets/update-spent`, { budgetId, spent: totalSpent });
-};
-
-// Delete item
+/**
+ * Delete an item (budget or expense).
+ * @param {object} params - The parameters including type (budgets/expenses) and id of the item.
+ * @returns {Promise<void>}
+ */
 export const deleteItem = async ({ type, id }) => {
-  const endPointMap = {
-    user: "users",
-    budgets: "budgets",
-    expenses: "expenses",
-  };
-
-  const endpoint = endPointMap[type];
-  if (!endpoint) {
-    console.warn("Invalid type:", type);
-    return;
+  try {
+    await axios.delete(`${BASE_URL}${type}/${id}`);
+    toast.success("Item deleted successfully!");
+  } catch (error) {
+    console.error(`Error deleting ${type} with id ${id}:`, error);
+    toast.error("Failed to delete item. Please try again.");
   }
-
-  await deleteData(endpoint, id);
 };
 
-// Fetch all necessary data during app initialization
-export const initializeData = async () => {
-  const users = await fetchData("users");
-  const budgets = await fetchData("budgets");
-  const expenses = await fetchData("expenses");
+/**
+ * Update the spent amount for a specific budget.
+ * @param {string} budgetId - The ID of the budget to update.
+ * @returns {Promise<void>}
+ */
+export const updateSpentAmount = async (budgetId) => {
+  try {
+    const expenses = await fetchData(`expenses?budgetId=${budgetId}`);
+    const totalSpent = expenses.reduce((sum, expense) => sum + expense.amount, 0);
 
-  return { users, budgets, expenses };
+    await axios.patch(`${BASE_URL}budgets/${budgetId}`, { spent: totalSpent });
+    toast.info("Spent amount updated!");
+  } catch (error) {
+    console.error("Error updating spent amount:", error);
+    toast.error("Failed to update spent amount. Please try again.");
+  }
+};
+
+/**
+ * Format a number as currency (USD).
+ * @param {number} amount - The amount to format.
+ * @returns {string} - The formatted currency string.
+ */
+export const formatCurrency = (amount) => {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+  }).format(amount);
+};
+
+/**
+ * Get a random color for budgets.
+ * @returns {string} - A hex color code.
+ */
+export const getRandomColor = () => {
+  const colors = [
+    "#FF5733", "#33FF57", "#3357FF", "#F3FF33", "#33FFF3", "#FF33F3", "#F333FF"
+  ];
+  return colors[Math.floor(Math.random() * colors.length)];
+};
+
+/**
+ * Validate a budget or expense input.
+ * @param {object} input - The input data (e.g., { name, amount }).
+ * @returns {boolean} - True if valid, false otherwise.
+ */
+export const validateInput = (input) => {
+  if (!input.name || typeof input.name !== "string" || input.name.trim() === "") {
+    toast.error("Invalid name. Please provide a valid name.");
+    return false;
+  }
+  if (isNaN(input.amount) || input.amount <= 0) {
+    toast.error("Invalid amount. Please enter a positive number.");
+    return false;
+  }
+  return true;
 };

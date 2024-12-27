@@ -10,31 +10,49 @@ import Navbar from "../Components/Navbar";
 import { fetchData } from "../helpers";
 
 // loader
+/**
+ * Loader function to fetch data for the main page.
+ * @returns {Promise<object>} The combined data for the current user, budgets, and expenses.
+ */
 export async function mainLoader() {
   try {
-  localStorage.setItem("userId", user.id); // Save the user ID returned from the backend
-  const budgetId = null; // Adjust or retrieve dynamically from route or state
+    // Fetch the current user data from localStorage
+    const userId = localStorage.getItem("userId");  // Assuming userId is stored in localStorage
+    if (!userId) {
+      // If no userId exists, it's the first-time user or a logged-out user
+      return { currentUserName:userId, budgets: [], expenses: [] };
+    }
+    
+    const currentUserName = userId ? await fetchData("users", userId) : null;  // Fetch the user data if userId is available
+    
+    // Fetch all budgets from the backend
+    const budgets = await fetchData("budgets");  // Fetch all budgets
+    
+    // Fetch all expenses associated with the budgets (based on the budget IDs)
+    const expenses = budgets.length
+      ? await Promise.all(
+          budgets.map((budget) => fetchData("expenses", budget.id))  // Fetch expenses for each budget
+        )
+      : [];  // If no budgets, no expenses to fetch
+    
+    // Flatten the array of expenses to combine them into a single list
+    const flattenedExpenses = expenses.flat();
 
-  // Attempt to fetch the data from backend
-  const userData = userId ? await fetchData("users", userId) : null; // Calls `/api/users/:userId`
-  const budgets = await fetchData("budgets") // Calls `/api/budgets/`
-  const expenses = budgets.length // Calls `/api/expenses/:budgetId`
-    ? await Promise.all(
-      budgets.map((budget) => fetchData("expenses", budget.id))
-    ) : [];
+    // Fallback to "Guest" if no user is found
+    const currentUserNameFallback = currentUserName?.name; 
 
-  // Combine all expenses
-  const flattendExpenses = expenses.flat();
-
-
-  // Fallback to Budgets.user if localStorage is not popluated
-  const currentUserName = userData?.name || "Guest";
-
-  return { currentUserName, budgets, expenses: flattendExpenses };
-} catch (error) {
-  console.error("Error loading data:", error);
-  return {currentUserName: "Guest", budgets: [], expenses: []};
-}
+    // Return the data to be used in the Dashboard component
+    return {
+      currentUserName: currentUserNameFallback,
+      budgets,
+      expenses: flattenedExpenses,
+    };
+  } catch (error) {
+    console.error("Error loading data:", error);
+    
+    // Return default data if there's an error
+    return { currentUserName: "Guest", budgets: [], expenses: [] };
+  }
 }
 
 const Main = () => {

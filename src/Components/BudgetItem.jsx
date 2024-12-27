@@ -1,43 +1,33 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
+import { updateSpentAmount } from "../helpers";
 
+const BudgetItem = ({ budget, expenses, refreshData }) => {
+  const { id, name, amount, color } = budget;
+  const [totalSpent, setTotalSpent] = useState(0);
 
-const BudgetItem = ({ budgetId, budgets, expenses }) => {
-  
-  const [totalSpent, setTotalSpent] = useState(0); // State to track total spent
-  const { id, name, amount, color } = budgets; // Ensure "spent" reflects the latest state
-  
   useEffect(() => {
-
-    // async function to update spent amount
-    const fetchAndUpdateSpent = async () => {
+    const calculateSpent = async () => {
       try {
-        // Updates the "spent" amount from the backend
-        await updateSpentAmount(budgetId);
-        
-        // Fetch the updated data after updating
-        const updatedExpenses = expenses.filter(exp => exp.budgetId === budgetId);
-        const newTotalSpent = updatedExpenses.reduce((total, exp) => total + exp.amount, 0);
-        
-        // Update the state with new total spent
-        setTotalSpent(newTotalSpent)
+        const updatedSpent = expenses.reduce((total, expense) => total + expense.amount, 0);
+        await updateSpentAmount(id); // Ensure backend sync
+        setTotalSpent(updatedSpent);
       } catch (error) {
-        console.error("Error updating spent amount:", error)
+        console.error("Error updating spent amount:", error);
       }
     };
-    
-    fetchAndUpdateSpent(); // Call the async function
-  }, [expenses, budgetId]); // Dependencies to trigger the effect
-  
+
+    calculateSpent();
+  }, [expenses, id]);
+
   const remaining = amount - totalSpent;
-  
+
   return (
     <div className="budget" style={{ "--accent": color }}>
       <div className="progress-text">
         <h2 className="budgetName">{name}</h2>
         <p className="budgAmount">Budget Amount: ${amount}</p>
       </div>
-      {/* Update progress dynamically to reflect spent */}
-      <progress max={amount} value={totalSpent} ></progress>
+      <progress max={amount} value={totalSpent}></progress>
       <div className="progress-text">
         <small>${totalSpent.toFixed(2)} spent</small>
         <small>${remaining.toFixed(2)} remaining</small>

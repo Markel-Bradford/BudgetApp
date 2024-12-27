@@ -5,7 +5,6 @@ import Error from "./Pages/Error";
 
 //Layout
 import Main, { mainLoader } from "./layouts/Main";
-import Dashboard, { dashboardAction, dashboardLoader } from "./Pages/Dashboard";
 
 //Actions
 import { logoutAction } from "./actions/logout";
@@ -13,6 +12,7 @@ import { logoutAction } from "./actions/logout";
 //Library imports
 import {ToastContainer} from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
+import Dashboard from "./Pages/Dashboard";
 
 
 
@@ -25,8 +25,6 @@ const router = createBrowserRouter([
       {
         index: true,
         element: <Dashboard />,
-        loader: dashboardLoader,
-        action: dashboardAction,
         errorElement: <Error />
       },
     {
