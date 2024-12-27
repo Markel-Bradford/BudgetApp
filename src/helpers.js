@@ -18,7 +18,7 @@ export const fetchData = async (endpoint) => {
     return response.data;
   } catch (error) {
     console.error(`Error fetching data from ${endpoint}:`, error);
-    return null;
+    return [];
   }
 };
 
