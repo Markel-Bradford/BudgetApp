@@ -17,7 +17,9 @@ console.log(connectDB)
 
 const app = express();
 app.use(cors())
-app.use(express.json()); // Middleware to parse JSON
+
+// Middleware to parse JSON
+app.use(express.json()); 
 
 // Restrict CORS
 const allowedOrigins = [
@@ -35,6 +37,8 @@ app.use(cors({
             callback(new Error(`CORS Error: Origin ${origin} is not allowed`));
         }
     },
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Specify allowed HTTP methods
+    credentials: true, // Allow credentials (e.g., cookies, authorization headers)
 }));
 
 // API Routes
