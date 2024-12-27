@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Form, useFetcher } from "react-router-dom";
 import { ArrowRightEndOnRectangleIcon, UserPlusIcon } from "@heroicons/react/24/solid";
-import { newUser } from "../helpers";
+import { loginUser, newUser } from "../helpers";
 import axios from "axios";
 import { toast } from "react-toastify";
 
@@ -42,12 +42,9 @@ const Signin = () => {
       // Handle sign in
       try {
         // Check if user exists
-        const response = await axios.get("https://budgetapp-37rv.onrender.com/api/users/login", {
-          params: { name: usernameInput.trim(), email: emailInput.trim() },
-        });
-        localStorage.setItem("userId", response.data._id);
-        toast.success("Signed in successfully!");
-        console.log("User logged in:", response.data);
+        if (usernameInput.trim(), emailInput.trim()) {
+          loginUser({name: usernameInput.trim(), email: emailInput.trim()});
+        }
       } catch (error) {
         if (error.response && error.response.status === 404) {
           toast.error("User not found. Please create an account.");

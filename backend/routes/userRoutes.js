@@ -56,7 +56,7 @@ router.get('/login', async (req, res) => {
     if (!isValidEmail(email)) {
         return res.status(400).json({ error: "Invalid email format." });
     }
-        
+
     try {
         console.log("Login attempt:", { name, email }); // Log the input data
 
@@ -67,7 +67,8 @@ router.get('/login', async (req, res) => {
         if (!user) {
             return res.status(404).json({ error: 'User not found.' });
         }
-
+        
+        console.log("User found:", user); // Log the retrieved user
         // Respond with user details
         res.json({
             id: user._id,

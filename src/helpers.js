@@ -40,6 +40,27 @@ export const newUser = async (user) => {
 };
 
 /**
+ * Log in a user by name and email.
+ * @param {object} user - User credentials.
+ * @returns {Promise<object>} The logged-in user data.
+ */
+export const loginUser = async (user) => {
+  try {
+      const response = await axios.get(`${BASE_URL}users/login`, {
+          params: user,
+      });
+      console.log("Logged in user:", response.data);
+      localStorage.setItem("userId", response.data.id);
+      toast.success("Login successful!");
+      return response.data;
+  } catch (error) {
+      console.error("Error logging in user:", error);
+      toast.error("Login failed. Please try again.");
+      throw error;
+  }
+};
+
+/**
  * Create a new budget.
  * @param {object} budget - The budget data to be created.
  * @returns {Promise<void>}
