@@ -40,4 +40,31 @@ router.get('/:userId', async (req, res) => {
     }
 })
 
+router.get('/login', async (req, res) => {
+    const {name, email} = req.query;
+
+    // Handle missing name and email
+    if (!name || !email) {
+        return res.status(400).json({error: 'Name and email are required.'})
+    }
+    
+    try {
+        const user = await User.findOne({name, email});
+
+        // If user not found, return 404
+        if (!user) {
+            return res.status(404).json({ error: 'User not found.' });
+        }
+
+        // Respond with user details
+        res.json({
+            id: user._id,
+            name: user.name,
+            email: user.email,
+        });
+    } catch (error) {
+        res.status(500).json({error: error.message});
+    }
+})
+
 module.exports = router;

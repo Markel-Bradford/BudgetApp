@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Form } from "react-router-dom";
 import { ArrowRightEndOnRectangleIcon, UserPlusIcon } from "@heroicons/react/24/solid";
 import { newUser } from "../helpers";
+import axios from "axios";
 
 const Signin = () => {
   const [usernameInput, setUsernameInput] = useState("");
@@ -14,8 +15,32 @@ const Signin = () => {
     } else {
       console.log("Please enter a valid username.")
     }
+  }
 
+  const handleSignin = async (e) => {
+    e.preventDefault();
 
+    if (!usernameInput.trim() || !emailInput.trim()) {
+      toast.error("Name and email required.")
+      console.log("Please enter a name and email.")
+      return
+    }
+
+    try {
+      // Check if user exists
+      const response = await axios.get("https://budgetapp-37rv.onrender.com/api/users/login", {
+        params: {name: usernameInput.trim(), email: emailInput.trim() },
+      });
+
+      console.log("User logged in:", response.data)
+      localStorage.setItem("userId", response.data._id)
+    } catch (error) {
+      if (error.response && error.response.status === 404) {
+        toast.error("User not found. Please create an account.");
+      } else {
+        console.log("An error occurred. Please try again.");
+      }
+    }
   }
 
   return (
@@ -31,7 +56,7 @@ const Signin = () => {
           <li>e</li>
           <li>!</li>
         </ul>
-        <Form className="signInForm" method="POST" onSubmit={handleCreateAccount}>
+        <Form className="signInForm" method="POST" onSubmit={handleSignin}>
           <h2 id="welcomeMessage">Sign in and let's get started!</h2>
           <input
             type="text"
@@ -54,7 +79,7 @@ const Signin = () => {
           onChange={(e) => setEmailInput(e.target.value)} />
           <input type="hidden" name="_action" value="newUser" />
           <div className="btncontainer">
-          <button type="submit" className="submitbutton" >
+          <button type="submit" className="submitbutton" onClick={handleCreateAccount}>
             Create Account
             <UserPlusIcon width={20} />
           </button>

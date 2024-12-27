@@ -10,7 +10,7 @@ export async function logoutAction() {
     try {
         // Delete the user session data (e.g., userId or auth token)
         deleteItem({
-            type: "user",  // Assumes 'deleteItem' can handle this action
+            type: "user", 
         });
 
         // Display success toast notification

@@ -75,12 +75,13 @@ export const newExpense = async (expense) => {
  * @param {object} params - The parameters including type (budgets/expenses) and id of the item.
  * @returns {Promise<void>}
  */
-export const deleteItem = async ({ type, id }) => {
+export const deleteItem = async ({ type, _id }) => {
   try {
-    await axios.delete(`${BASE_URL}${type}/${id}`);
+    await axios.delete(`${BASE_URL}${type}/${_id}`);
+    localStorage.removeItem("userId")
     toast.success("Item deleted successfully!");
   } catch (error) {
-    console.error(`Error deleting ${type} with id ${id}:`, error);
+    console.error(`Error deleting ${type} with id ${_id}:`, error);
     toast.error("Failed to delete item. Please try again.");
   }
 };

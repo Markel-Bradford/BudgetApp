@@ -36,7 +36,7 @@ const Dashboard = () => {
 <>
 {userData.currentUserName ? (
     <div className="dashboard">
-      <h1 className="welcome">Welcome, <span className="accent">{userData.currentUserName}</span></h1>
+      <h1 className="welcome">Welcome, <span className="accent">{userData.currentUserName.name}</span></h1>
       <div className="grid-sm">
         {budgets.length > 0 ? (
           <div className="grid-lg">
