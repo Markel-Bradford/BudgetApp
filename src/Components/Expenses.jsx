@@ -73,8 +73,9 @@ const ExpenseItem = ({ expense, budgetId, onDeleteExpense }) => {
   };
 
   return (
+    <div className="expenseDetailsContainer">
     <li className="expenseDetails">
-      <span>{expense.name}</span>
+      <span>Expense: {expense.name}</span>
       <span>${expense.amount.toFixed(2)}</span>
       <span>
         <TrashIcon
@@ -84,6 +85,7 @@ const ExpenseItem = ({ expense, budgetId, onDeleteExpense }) => {
         />
       </span>
     </li>
+    </div>
   );
 };
 

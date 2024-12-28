@@ -693,7 +693,7 @@ label {
   box-shadow: 0.25em 0.3em 1em hsl(var(--muted) / 0.2);
   background-color: #fff;
   border-radius: var(--round-lg);
-  border: 3px solid hsl(var(--backdrop));
+  border: 4px solid var(--accent);
   padding: calc(var(--space-md) / 1.5) calc(var(--space-md) / 1.2);
   gap: var(--space-sm);
   text-decoration: none;
@@ -727,7 +727,7 @@ label {
   text-align: right;
 }
 
-.progress-text:nth-of-type(2) :nth-child(2) {
+.progress-text {
   color: hsl(var(--muted));
 }
 

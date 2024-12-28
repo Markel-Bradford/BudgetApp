@@ -30,7 +30,7 @@ const BudgetItem = ({ budget, expenses }) => {
         <h2 className="budgetName">{name}</h2>
         <p className="budgAmount">Budget Amount: ${amount}</p>
       </div>
-      <progress max={amount} value={totalSpent}></progress>
+      <progress max={amount} value={totalSpent} ></progress>
       <div className="progress-text">
         <small>${totalSpent.toFixed(2)} spent</small>
         <small>${remaining.toFixed(2)} remaining</small>
