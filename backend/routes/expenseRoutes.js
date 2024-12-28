@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Expense = require('../models/Expense');
+const { findByIdAndUpdate } = require('../models/User');
 
 
 // Add new expense
@@ -8,6 +9,15 @@ router.post('/', async (req, res) => {
     const { budgetsId, name, amount} = req.body;
     try {
         const expense = await Expense.create({ budgetsId, name, amount });
+
+        // Calculate the total spent for the budget
+        const expenses = await Expense.find({budgetsId})
+        const totalSpent = expenses.reduce((sum, expense) => + expense.amount, 0)
+
+        // Update corresponding budgets spent amout
+        await Budget,findByIdAndUpdate(budgetsId, {spent: totalSpent}, {new: true});
+        
+        // Respond with newly created expense
         res.status(201).json(expense)
     } catch (error) {
         res.status(500).json({error: error.message});
@@ -22,16 +32,6 @@ router.get('/:budgetsId', async (req, res) => {
     } catch (error) {
         res.status(500).json({error: error.message});
     }
-});
-
-router.patch(':/budgetsId', async (req, res) => {
-    const { spent } = req.body;
-  try {
-    const budget = await Budget.findByIdAndUpdate(req.params.id, { spent }, { new: true });
-    res.json(budget);
-  } catch (error) {
-    res.status(500).send("Failed to update budget");
-  }
 });
 
 module.exports = router;

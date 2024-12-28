@@ -8,8 +8,10 @@ const BudgetItem = ({ budget, expenses, refreshData }) => {
   useEffect(() => {
     const calculateSpent = async () => {
       try {
-        const budgetExpenses = expenses.filter((expense) => expense.budgetsId === _id); // Filter by specific budget ID
-        const updatedSpent = expenses.reduce((total, expense) => total + expense.amount, 0);
+        // Filter expenses for current budget
+        const budgetExpenses = expenses.filter((expense) => expense.budgetsId === _id);
+        // Calculate total spent for this budget
+        const updatedSpent = budgetExpenses.reduce((total, expense) => total + expense.amount, 0);
         
         // Update backend with new spend amount
         await updateSpentAmount(_id);

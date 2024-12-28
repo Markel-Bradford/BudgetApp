@@ -31,6 +31,7 @@ const AddBudgetForm = ({ userId, refreshBudgets }) => {
             name: budgetName,
             amount: parseFloat(amount),
             color,
+            spent: 0,
           };
 
           console.log("Budget Payload:", payload); // Debug log

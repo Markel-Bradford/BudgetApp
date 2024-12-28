@@ -5,9 +5,9 @@ const Budget = require('../models/Budget');
 
 // Add new budget
 router.post('/', async (req, res) => {
-    const {userId, name, amount, color } = req.body;
+    const {userId, name, amount, color, spent } = req.body;
     try {
-        const budget = await Budget.create({userId, name, amount, color});
+        const budget = await Budget.create({userId, name, amount, color, spent});
         res.status(201).json(budget);
     } catch (error) {
         console.error("Error creating budget:", error)
@@ -23,6 +23,16 @@ router.get('/:userId', async (req, res) => {
     } catch (error) {
         res.status(500).json({error: error.message});
     }
+});
+
+router.patch('/:budgetsId', async (req, res) => {
+    const { spent } = req.body;
+  try {
+    const budget = await Budget.findByIdAndUpdate(req.params.id, { spent }, { new: true });
+    res.json(budget);
+  } catch (error) {
+    res.status(500).send("Failed to update budget");
+  }
 });
 
 module.exports = router;
