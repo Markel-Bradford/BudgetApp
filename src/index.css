@@ -809,6 +809,7 @@ small {
   border: #FFD700 2px solid;
   border-radius: 16px;
   padding:0 20px 25px 20px;
+  color: #ffffff;
 }
 
 .expenseList {

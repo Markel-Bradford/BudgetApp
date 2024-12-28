@@ -1,13 +1,14 @@
 import React from "react";
-import { deleteItem, fetchData, updateSpentAmount } from "../helpers";
+import { deleteExpenseAndUpdateBudget, deleteItem, fetchData, updateSpentAmount } from "../helpers";
 import { TrashIcon } from "@heroicons/react/24/solid";
 
 const Expenses = ({ budgets, refreshData }) => {
   console.log("Budgets passed to Expenses:", budgets); // Add this log to verify the data
   
-  const handleDeleteExpense = async (expenseId) => {
+  const handleDeleteExpense = async (expenseId, budgetId, amount) => {
     try {
-      await deleteItem({ type: "expenses", id: expenseId });
+      // Delete the expense and update the budget amount
+      await deleteExpenseAndUpdateBudget({ expenseId, budgetId, amount });
       refreshData();
     } catch (error) {
       console.error("Error deleting expense:", error);
@@ -63,7 +64,7 @@ const BudgetWithExpenses = ({ budget, refreshData, onDeleteExpense }) => {
 const ExpenseItem = ({ expense, budgetId, onDeleteExpense }) => {
   const handleDelete = () => {
     if (window.confirm(`Delete expense "${expense.name}"?`)) {
-      onDeleteExpense(expense._id, budgetId);
+      onDeleteExpense(expense._id, budgetId, expense.amount);
     }
   };
 
@@ -71,6 +72,7 @@ const ExpenseItem = ({ expense, budgetId, onDeleteExpense }) => {
     <li className="expenseDetails">
       <span>{expense.name}</span>
       <span>${expense.amount.toFixed(2)}</span>
+      <span>Date: {new Date(expense.createdAt).toLocaleDateString()}</span>
       <span>
         <TrashIcon width={20} style={{ color: "red", cursor: "pointer" }} onClick={handleDelete} />
       </span>

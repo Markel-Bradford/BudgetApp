@@ -9,7 +9,9 @@ router.post("/", async (req, res) => {
 
   // Ensure that all required fields are present
   if (!budgetId || !name || !amount || amount < 0) {
-    return res.status(400).json({ error: "Missing required fields (budgetId, name, amount)" });
+    return res
+      .status(400)
+      .json({ error: "Missing required fields (budgetId, name, amount)" });
   }
 
   const budgetExists = await Budget.findById(budgetId);
@@ -20,7 +22,7 @@ router.post("/", async (req, res) => {
   try {
     const budget = await Budget.findById(budgetId);
     if (!budget) {
-        return res.status(404).json({ error: 'Budget not found' });
+      return res.status(404).json({ error: "Budget not found" });
     }
 
     const expense = await Expense.create({ budgetId, name, amount });
@@ -49,6 +51,43 @@ router.post("/", async (req, res) => {
     res.status(201).json(expense);
   } catch (error) {
     console.error("Error while creating expense:", error.message);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.delete("/:expenseId", async (req, res) => {
+  console.log(`Expense deleted for expense ID: ${req.params.expenseId}`);
+  const { budgetId, amount } = req.body;
+  
+  try {
+    // Find the budget by ID
+    const budget = await Budget.findById(budgetId);
+    if (!budget) {
+      return res.status(404).json({ error: "Budget not found" });
+    }
+
+    const updatedBudget = await Budget.findByIdAndUpdate(
+        budgetId,
+        {
+          $pull: { expenses: req.params.expenseId }, // Add the new expense ID to the expenses array
+          $inc: { spent: -amount }, // Decrement the spent amount
+        },
+        { new: true }
+      );
+      if (!updatedBudget) {
+        throw new Error("Budget not found");
+      }  
+
+    const deleteExpenses = await Expense.deleteOne({_id: req.params.expenseId});
+
+    if (deleteExpenses.deletedCount === 0) {
+        return res.status(404).json({ error: "Expense not found" });
+    }
+
+    console.log(`Expense deleted with ID: ${req.params.expenseId}`);
+    res.status(200).json({ message: "Expense deleted successfully", updatedBudget });
+  } catch (error) {
+    console.error("Error deleting expenses:", error.message);
     res.status(500).json({ error: error.message });
   }
 });

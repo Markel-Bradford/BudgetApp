@@ -121,6 +121,33 @@ export const deleteItem = async ({ type, id }) => {
 };
 
 /**
+ * Delete an expense and update the corresponding budget's spent amount.
+ * @param {string} expenseId - The ID of the expense to delete.
+ * @param {string} budgetId - The ID of the budget that the expense belongs to.
+ * @param {number} amount - The amount to decrement from the budget's spent amount.
+ * @returns {Promise<void>}
+ */
+export const deleteExpenseAndUpdateBudget = async (expenseId, budgetId, amount) => {
+  try {
+    // First, delete the expense
+    await axios.delete(`${BASE_URL}expenses/${expenseId}`);
+    toast.success("Expense deleted successfully!");
+
+    // Then, update the budget's spent amount
+    const expenses = await fetchData(`expenses/${budgetId}`);
+    const totalSpent = expenses.reduce((sum, expense) => sum + expense.amount, 0);
+
+    // Now, update the budget's spent value
+    await axios.patch(`${BASE_URL}budgets/${budgetId}`, { spent: totalSpent });
+    toast.info("Budget spent amount updated!");
+
+  } catch (error) {
+    console.error("Error deleting expense and updating budget:", error);
+    toast.error("Failed to delete expense and update budget.");
+  }
+};
+
+/**
  * Update the spent amount for a specific budget.
  * @param {string} budgetId - The ID of the budget to update.
  * @returns {Promise<void>}
