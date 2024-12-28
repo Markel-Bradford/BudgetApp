@@ -76,7 +76,6 @@ export const newBudget = async (budget) => {
   try {
     const response = await axios.post(`${BASE_URL}budgets`, budget);
     console.log("Budget Payload:", budget);
-    toast.success("Budget created successfully!");
     return response
   } catch (error) {
     console.error("Error creating budget:", error);
@@ -93,7 +92,6 @@ export const newExpense = async (expense) => {
   try {
     const response = await axios.post(`${BASE_URL}expenses`, expense);
     console.log(response.data)
-    toast.success("Expense added successfully!");
     return response
   } catch (error) {
     console.error("Error creating expense:", error);
