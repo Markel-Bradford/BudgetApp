@@ -161,16 +161,20 @@ export const formatCurrency = (amount) => {
  */
 export const getRandomColor = () => {
   const colors = [
-    "#FF5733",
-    "#33FF57",
-    "#3357FF",
-    "#F3FF33",
-    "#33FFF3",
-    "#FF33F3",
-    "#F333FF",
+    "#2E3A87",  // Dark blue
+    "#4A1F24",  // Dark red
+    "#3A3A3A",  // Dark gray
+    "#1B4D3E",  // Dark green
+    "#5C2A9D",  // Dark purple
+    "#2F4F4F",  // Dark slate gray
+    "#B22222",  // Firebrick red
+    "#A52A2A",  // Brown
+    "#6A1B9A",  // Purple
+    "#D32F2F",  // Red
   ];
   return colors[Math.floor(Math.random() * colors.length)];
 };
+
 
 /**
  * Validate a budget or expense input.
