@@ -46,7 +46,7 @@ const BudgetWithExpenses = ({ budget, onDeleteExpense, refreshBudgets  }) => {
   return (
     <div className="budgetExpenseList">
       <h3 className="budgetListName" onClick={toggleExpenses}>
-        {budget.name} (${budget.spent})
+        {budget.name} (${budget.spent.toFixed(2)})
       </h3>
       {isExpanded && (
         <ul className="expenseList">
@@ -77,6 +77,7 @@ const ExpenseItem = ({ expense, budgetId, onDeleteExpense }) => {
     <li className="expenseDetails">
       <span>Expense: {expense.name}</span>
       <span>${expense.amount.toFixed(2)}</span>
+      
       <span>
         <TrashIcon
           width={20}

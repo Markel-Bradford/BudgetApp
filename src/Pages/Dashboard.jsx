@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { fetchData, newBudget, newExpense } from "../helpers";
+import { fetchData } from "../helpers";
 import { toast } from "react-toastify";
 import AddBudgetForm from "../Components/AddBudgetForm";
 import AddExpenseForm from "../Components/AddExpenseForm";
 import BudgetItem from "../Components/BudgetItem";
 import Expenses from "../Components/Expenses";
-import { mainLoader } from "../layouts/Main";
 import Signin from "../Components/Signin";
 
 /**
@@ -13,23 +12,24 @@ import Signin from "../Components/Signin";
  */
 const Dashboard = () => {
   const [userData, setUserData] = useState({
-    currentUserName: "Guest",
+    currentUserName: null,
     budgets: [],
     expenses: [],
   });
   const [refreshedBudgets, setRefreshedBudgets] = useState([]);
   const [refreshedExpenses, setRefreshedExpenses] = useState([]);
   const [loading, setLoading] = useState(true); // Add a loading state
-  
+  const [error, setError] = useState(null); // To track any errors
+
   // Function to refresh budgets and expenses after actions
   const refreshBudgets = useCallback(async () => {
-    if (!currentUserName?.id) return;
-    
+    if (!userData.currentUserName?.id) return;
+
     try {
-      const updatedBudgets = await fetchData(`budgets/${currentUserName.id}`);
+      const updatedBudgets = await fetchData(`budgets/${userData.currentUserName.id}`);
       const updatedExpenses = [];
-    
-      // Fetch expense for each budget
+
+      // Fetch expenses for each budget
       for (const budget of updatedBudgets) {
         const expenses = await fetchData(`expenses/${budget._id}`);
         updatedExpenses.push(...expenses);
@@ -41,6 +41,7 @@ const Dashboard = () => {
     } catch (error) {
       toast.error("Failed to refresh budgets and expenses.");
       console.error("Error refreshing data:", error);
+      setError("Failed to refresh data.");
     }
   }, [userData.currentUserName?.id]);
 
@@ -48,45 +49,46 @@ const Dashboard = () => {
     // Initialize the app and fetch the user data based on login status
     const loadData = async () => {
       setLoading(true); // Start loading while fetching the data
+      setError(null); // Reset any previous error
       try {
-        const data = await mainLoader();
-        console.log("Fetched data:", data); // Log the fetched data
-        setUserData(data); // Set the user data once fetched
+        const userId = localStorage.getItem("userId");
+        if (!userId) {
+          setUserData({ currentUserName: null, budgets: [], expenses: [] });
+          setLoading(false); // Stop loading if no userId
+          return;
+        }
+
+        const fetchedUser = await fetchData(`users/${userId}`);
+        const fetchedBudgets = await fetchData(`budgets/${userId}`);
+
+        setUserData({ currentUserName: fetchedUser, budgets: fetchedBudgets });
+        setLoading(false); // Stop loading once data is fetched
       } catch (error) {
         console.error("Error loading data:", error);
-      } finally {
-        setLoading(false); // Stop loading once the data is fetched or fails
+        setError("Error loading data. Please try again later.");
+        setLoading(false); // Stop loading if there’s an error
       }
     };
 
     loadData(); // Call the initialization on component mount
-
-    // Listen for storage changes
-    const handleStorageChange = () => {
-      const userId = localStorage.getItem("userId");
-      if (!userId) {
-        setUserData({ currentUserName: null, budgets: [], expenses: [] });
-      }
-    };
-
-    window.addEventListener("storage", handleStorageChange);
-
-    return () => {
-      window.removeEventListener("storage", handleStorageChange);
-    };
   }, []);
 
   useEffect(() => {
-    if (userData.currentUserName.id) {
+    if (userData.currentUserName?.id) {
       refreshBudgets(); // Refresh only when user is present
     }
-  }, [userData.currentUserName?.id]); // Trigger when user changes
+  }, [userData.currentUserName?.id, refreshBudgets]);
 
-  const { currentUserName, budgets, expenses } = userData; // Destructure user data
-  
+  const { currentUserName } = userData; // Destructure user data
+
+  // Show error message if there's an issue loading data
+  if (error) {
+    return <div>{error}</div>;
+  }
+
+  // Render the loading screen until data is fetched
   if (loading) {
-    // Show a loading spinner or some loading indicator while fetching the data
-    return <div>Loading...</div>;
+    return <div style={{"display": "flex", "justifyContent": "center", "alignItems": "center"}}><img src="/BudgetApp/images/spinner.svg" style={{"width": "30%", "display": "flex"}} alt="Loading spinner" /></div>;
   }
 
   return (
@@ -121,7 +123,7 @@ const Dashboard = () => {
                     />
                   ))}
                 </div>
-                <Expenses budgets={refreshedBudgets || []} refreshBudgets={refreshBudgets} />
+                <Expenses budgets={refreshedBudgets} refreshBudgets={refreshBudgets} />
               </div>
             ) : (
               <div>
