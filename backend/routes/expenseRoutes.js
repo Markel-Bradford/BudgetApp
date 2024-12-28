@@ -6,12 +6,13 @@ const Budget = require('../models/Budget');
 
 // Add new expense
 router.post('/', async (req, res) => {
+    const { budgetsId, name, amount} = req.body;
+    
     // Ensure that all required fields are present
     if (!budgetsId || !name || !amount) {
         return res.status(400).json({ error: 'Missing required fields (budgetsId, name, amount)' });
     }
-    
-    const { budgetsId, name, amount} = req.body;
+
     try {
         const expense = await Expense.create({ budgetsId, name, amount });
         console.log('Created expense:', expense);
@@ -24,13 +25,17 @@ router.post('/', async (req, res) => {
         // Update corresponding budgets spent amout
         const updatedBudget =
         await Budget.findByIdAndUpdate(budgetsId, {spent: totalSpent}, {new: true});
+        
         if (!updatedBudget) {
             throw new Error('Budget not found')
         }
+
         // Log to onfirm the update budget
         console.log('Updated budget:', updatedBudget);
+
         // Log expense to verify proper creation
         console.log('Newly created expense:', expense);
+        
         // Respond with newly created expense
         res.status(201).json(expense)
     } catch (error) {

@@ -16,7 +16,6 @@ connectDB();
 console.log(connectDB)
 
 const app = express();
-app.use(cors())
 
 // Restrict CORS
 const allowedOrigins = [
