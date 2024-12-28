@@ -68,7 +68,7 @@ export const loginUser = async (user) => {
 export const newBudget = async (budget) => {
   try {
     const response = await axios.post(`${BASE_URL}budgets`, budget);
-    console.log(response.data)
+    console.log("Budget Payload:", budget);
     toast.success("Budget created successfully!");
     return response
   } catch (error) {
@@ -84,7 +84,7 @@ export const newBudget = async (budget) => {
  */
 export const newExpense = async (expense) => {
   try {
-    const response = await axios.post(`${BASE_URL}/expenses`, expense);
+    const response = await axios.post(`${BASE_URL}expenses`, expense);
     console.log(response.data)
     toast.success("Expense added successfully!");
     return response
@@ -120,9 +120,9 @@ export const deleteItem = async ({ type, id }) => {
  * @param {string} budgetId - The ID of the budget to update.
  * @returns {Promise<void>}
  */
-export const updateSpentAmount = async (expenseId) => {
+export const updateSpentAmount = async (budgetId, expenseId) => {
   try {
-    const expenses = await fetchData(`expenses/${expenseId}`);
+    const expenses = await fetchData(`expenses/${budgetId}`);
     const totalSpent = expenses.reduce(
       (sum, expense) => sum + expense.amount,
       0

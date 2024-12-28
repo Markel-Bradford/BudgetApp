@@ -24,22 +24,14 @@ router.get('/:budgetsId', async (req, res) => {
     }
 });
 
-router.patch(':/expenseId', async (req, res) => {
-    const {expenseId} = req.params
-    const {name, amount} = req.body
-    try {
-     const updatedExpense = await Expense.findByIdAndUpdate(
-        expenseId,
-        {name, amount},
-        {new: true} // Return the updated document
-    );
-    if (!updatedExpense) {
-        return res.status(404).json({ error: 'Expense not found' });
-    } 
-    res.json(updatedExpense);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-})
+router.patch(':/budgetsId', async (req, res) => {
+    const { spent } = req.body;
+  try {
+    const budget = await Budget.findByIdAndUpdate(req.params.id, { spent }, { new: true });
+    res.json(budget);
+  } catch (error) {
+    res.status(500).send("Failed to update budget");
+  }
+});
 
 module.exports = router;

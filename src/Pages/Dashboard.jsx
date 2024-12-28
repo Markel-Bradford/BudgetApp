@@ -9,38 +9,6 @@ import Expenses from "../Components/Expenses";
 import { mainLoader } from "../layouts/Main";
 import Signin from "../Components/Signin";
 
-  // Actions
-  export async function dashboardAction({ request }) {
-     
-    const data = await request.formData();
-    // Separates out the actions by the value to prevent repetively creating actions
-    const { _action, ...values } = Object.fromEntries(data);
-    //Stores the user input in the user array on form submission
-     try {
-      if (_action === "newBudget") {
-        // Call newBudget function from helpers. Pass values into the function
-        await newBudget({
-          name: values.newBudget,
-          amount: parseFloat(values.newBudgetAmount),
-        });
-        toast.success("Budget created successfully!");
-        } else if (_action === "newExpense") {
-      
-        await newExpense({
-          name: values.newExpense,
-          amount: values.newExpenseAmount,
-          budgetsId: values.budgetSelect,
-        });
-        toast.success(`New expense ${values.newExpense} was added!`);
-        }
-      } catch (e) {
-        console.error(e)
-        toast.error("There was a problem creating your expense.");
-        return {error: e.message}
-      }
-    }
-
-
 
 /**
  * Dashboard component that displays the user data, budgets, and expenses.
@@ -59,18 +27,21 @@ const Dashboard = () => {
   }, []);
 
   const {currentUserName, budgets, expenses} = userData; // Destructure user data
-
+  console.log("Current User:", currentUserName);
+  console.log("Current User ID:", currentUserName._id);
+  console.log("Current budgets:", budgets);
+  budgets.map((budget) => console.log("Budget ID:", budget._id));
   return (
 <>
 {currentUserName ? (
     <div className="dashboard">
       <h1 className="welcome">Welcome, <span className="accent">{currentUserName.name}</span></h1>
       <div className="grid-sm">
-        {budgets.length > 0 ? (
+        {budgets.length > 0 ? ( 
           <div className="grid-lg">
             <div className="flex-lg">
-              <AddBudgetForm userId={currentUserName._id}/>
-              <AddExpenseForm budgets={budgets}/>
+              <AddBudgetForm userId={currentUserName.id}/>
+              <AddExpenseForm budgets={budgets} budgetsId={budgets.map((budget) => budget._id)}/>
             </div>
             <h2 className="sectionTitle">Current Budgets</h2>
             <div className="currentBudgets">
@@ -84,7 +55,7 @@ const Dashboard = () => {
         ) : (
           <div>
             <p id="getstarted">Take the first steps towards achieving financial freedom. Create a new budget!</p>
-            <AddBudgetForm userId={currentUserName._id}/>
+            <AddBudgetForm userId={currentUserName.id}/>
           </div>
 	)}
       </div>

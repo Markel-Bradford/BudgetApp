@@ -14,6 +14,7 @@ const AddBudgetForm = ({ userId, refreshBudgets }) => {
   const focusRef = useRef();
 
   const handleBudgetFormSubmit = async (e) => {
+    e.preventDefault();
     const action = e.nativeEvent.submitter.getAttribute("data-action");
 
     if (!budgetName || !amount) {
@@ -25,14 +26,15 @@ const AddBudgetForm = ({ userId, refreshBudgets }) => {
       // Handle create account
       try {
         const color = getRandomColor(); // Generate a random color from helper
-        await newBudget({
+        const payload = {
             userId,
             name: budgetName,
             amount: parseFloat(amount),
             color,
-          });
-          console.log(`User created: ${name, amount}`)
-          toast.success("Budget created successfully!") 
+          };
+
+          console.log("Budget Payload:", payload); // Debug log
+          await newBudget(payload);
       } catch (error) {
         console.error("Error creating budget:", error);
         toast.error("Budget creation failed. Please try again.");

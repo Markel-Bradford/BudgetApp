@@ -8,8 +8,13 @@ const BudgetItem = ({ budget, expenses, refreshData }) => {
   useEffect(() => {
     const calculateSpent = async () => {
       try {
+        const budgetExpenses = expenses.filter((expense) => expense.budgetsId === _id); // Filter by specific budget ID
         const updatedSpent = expenses.reduce((total, expense) => total + expense.amount, 0);
-        await updateSpentAmount(_id); // Ensure backend sync
+        
+        // Update backend with new spend amount
+        await updateSpentAmount(_id);
+
+        // Update local state
         setTotalSpent(updatedSpent);
       } catch (error) {
         console.error("Error updating spent amount:", error);
