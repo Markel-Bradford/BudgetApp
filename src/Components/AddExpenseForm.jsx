@@ -2,10 +2,12 @@ import React, { useEffect, useRef, useState } from "react";
 import { Form, useFetcher } from "react-router-dom";
 import { newExpense } from "../helpers";
 
-const AddExpenseForm = ({ budgets, budgetsId, refreshBudgets }) => {
+const AddExpenseForm = ({ budgets, refreshBudgets }) => {
   const [expenseName, setExpenseName] = useState("");
   const [expenseAmount, setExpenseAmount] = useState("");
-  const [selectedBudgetId, setSelectedBudgetId] = useState("");
+  const [selectedBudgetId, setSelectedBudgetId] = useState(
+    budgets.length === 1 ? budgets[0]._id : ""
+  );
 
   const fetcher = useFetcher();
   const isSubmitting = fetcher.state === "submitting";
@@ -33,6 +35,11 @@ const AddExpenseForm = ({ budgets, budgetsId, refreshBudgets }) => {
 
         console.log("Expense Payload:", payload); // Debug log
         await newExpense(payload);
+        toast.success("Expense added successfully!");
+        setExpenseName("");
+        setExpenseAmount("");
+        setSelectedBudgetId(budgets.length === 1 ? budgets[0]._id : ""); // Reset budget selection if multiple
+        refreshBudgets()
       } catch (error) {
         console.error("Error creating expense:", error);
         toast.error("Expense creation failed. Please try again.");
@@ -41,32 +48,23 @@ const AddExpenseForm = ({ budgets, budgetsId, refreshBudgets }) => {
   };
 
   const handleBudgetChange = (e) => {
-    const selectedBudget = budgets.find((budget) => budget._id === selectedBudgetId);
-    console.log("Selected Budget Object:", selectedBudget);
     setSelectedBudgetId(e.target.value);
-    console.log("Selected budget ID: ", selectedBudgetId);
   };
 
   // If form is not submitting, the form will be reset.
-  useEffect(
-    () => {
-      if (!isSubmitting) {
-        //clear form
-        formRef.current.reset();
-        if (refreshBudgets) {
-          refreshBudgets(); // Notify parent to refresh budgets and expenses
-        }
-      }
-    }, //reset focus
-    [isSubmitting, refreshBudgets]
-  );
+  useEffect(() => {
+    if (!isSubmitting) {
+      formRef.current.reset();
+      focusRef.current?.focus();
+    }
+  }, [isSubmitting]); // Refresh parent only if necessary
 
   return (
     <div className="form-wrapper">
       <h3>
         Add New {""}
         <span>
-          {budgets.length === 1 && `${budgets.map((budg) => budg.name)}`}
+          {budgets.length === 1 && <span>{budgets[0].name} </span>}
         </span>{" "}
         {/*If budgets.length is equal to 1, it will display the name of the budget receiving an input */}
         {""}Expense

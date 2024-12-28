@@ -128,7 +128,7 @@ export const updateSpentAmount = async (budgetId, expenseId) => {
       0
     );
 
-    await axios.patch(`${BASE_URL}expenses/${expenseId}`, { spent: totalSpent });
+    await axios.patch(`${BASE_URL}budgets/${expenseId}`, { spent: totalSpent });
     toast.info("Spent amount updated!");
   } catch (error) {
     console.error("Error updating spent amount:", error);

@@ -15,7 +15,7 @@ router.post('/', async (req, res) => {
         const totalSpent = expenses.reduce((sum, expense) => + expense.amount, 0)
 
         // Update corresponding budgets spent amout
-        await Budget,findByIdAndUpdate(budgetsId, {spent: totalSpent}, {new: true});
+        await Budget.findByIdAndUpdate(budgetsId, {spent: totalSpent}, {new: true});
         
         // Respond with newly created expense
         res.status(201).json(expense)

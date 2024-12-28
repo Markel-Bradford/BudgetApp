@@ -24,7 +24,6 @@ export async function mainLoader() {
     
     // Fetch all budgets from the backend
     const budgets = userId ? (await fetchData(`budgets/${userId}`)) : [];  // Fetch all budgets
-    console.log('Fetching budgets:', budgets);
 
     // Fetch all expenses associated with the budgets (based on the budget IDs)
     const expenses = budgets.length > 0
@@ -32,10 +31,8 @@ export async function mainLoader() {
           budgets.map((budget) => fetchData(`expenses/${budget._id}`))  // Fetch expenses for each budget
         )
       : [];  // If no budgets, no expenses to fetch
-    console.log('Fetching expenses:', expenses)
     // Flatten the array of expenses to combine them into a single list
     const flattenedExpenses = expenses.flat();
-    console.log(flattenedExpenses)
 
     // Return the data to be used in the Dashboard component
     return {

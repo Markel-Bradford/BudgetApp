@@ -13,9 +13,6 @@ const BudgetItem = ({ budget, expenses, refreshData }) => {
         // Calculate total spent for this budget
         const updatedSpent = budgetExpenses.reduce((total, expense) => total + expense.amount, 0);
         
-        // Update backend with new spend amount
-        await updateSpentAmount(_id);
-
         // Update local state
         setTotalSpent(updatedSpent);
       } catch (error) {
