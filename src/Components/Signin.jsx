@@ -6,9 +6,33 @@ import axios from "axios";
 import { toast } from "react-toastify";
 
 const Signin = () => {
-  const [usernameInput, setUsernameInput] = useState("");
-  const [emailInput, setEmailInput] = useState("");
+  const [usernameInput, setUsernameInput] = useState("Guest");
+  const [emailInput, setEmailInput] = useState("guest.player1086@gmail.com");
   const navigate = useNavigate();
+
+  // Auto-populate and clear the input when clicked
+  const handleFocus = (e) => {
+    if (e.target.value === e.target.defaultValue) {
+      e.target.value = "";
+    }
+  };
+  
+  useEffect(() => {
+    const handleLoad = () => {
+      alert(
+        "Please feel free to sign in using the guest credentials to test functionality. \n"+
+        "Name: Guest \n" +
+        "Email: guest.player1086@gmail.com \n" +
+        "You can also enter your own credentials to create a personal account!"
+      );
+    };
+
+    window.onload = handleLoad;
+
+    return () => {
+      window.onload = null; // Clean up event listen upon dismount
+    }
+  }, [])
 
   const handleFormSubmit = async (e) => {
     const action = e.nativeEvent.submitter.getAttribute("data-action");
@@ -23,7 +47,11 @@ const Signin = () => {
       try {
         if (usernameInput.trim(), emailInput.trim()) {
           newUser({name: usernameInput.trim(), email: emailInput.trim()});
-          navigate("/"); // Redirect to dashboard
+          
+            navigate("/"); // Redirect to baseroute
+
+          
+
           console.log("User created:", usernameInput, emailInput);
         } else {
           console.error("Error signing in:", error);
@@ -45,7 +73,8 @@ const Signin = () => {
         // Check if user exists
         if (usernameInput.trim(), emailInput.trim()) {
           await loginUser({name: usernameInput.trim(), email: emailInput.trim()});
-          navigate("/"); // Redirect to dashboard
+          
+            navigate("/"); // Redirect to baseroute
         }
       } catch (error) {
         if (error.response && error.response.status === 404) {
@@ -80,7 +109,8 @@ const Signin = () => {
             required
             placeholder="What is your name?"
             autoComplete="given-name"
-            value={usernameInput}
+            value={ usernameInput }
+            onFocus={handleFocus} // Clear the input on focus if it's still the default value
             onChange={(e) => setUsernameInput(e.target.value)} // Update state dunamically
           />
           <input 
@@ -90,7 +120,8 @@ const Signin = () => {
           required
           placeholder="john.doe@gmail.com"
           autoComplete="email"
-          value={emailInput}
+          value={ emailInput }
+          onFocus={handleFocus} // Clear the input on focus if it's still the default value
           onChange={(e) => setEmailInput(e.target.value)} />
           <input type="hidden" name="_action" value="newUser" />
           <div className="btncontainer">

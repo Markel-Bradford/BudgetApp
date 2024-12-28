@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { useLoaderData } from "react-router-dom";
 import { fetchData, newBudget, newExpense } from "../helpers";
 import { toast } from "react-toastify";
 import AddBudgetForm from "../Components/AddBudgetForm";
@@ -20,20 +19,23 @@ const Dashboard = () => {
   });
   const [refreshedBudgets, setRefreshedBudgets] = useState([]);
   const [refreshedExpenses, setRefreshedExpenses] = useState([]);
+  const [loading, setLoading] = useState(true); // Add a loading state
   
   // Function to refresh budgets and expenses after actions
   const refreshBudgets = useCallback(async () => {
+    if (!currentUserName?.id) return;
+    
     try {
-      const updatedBudgets = (await fetchData(`budgets/${userData.currentUserName.id}`)) || [];
+      const updatedBudgets = await fetchData(`budgets/${currentUserName.id}`);
       const updatedExpenses = [];
     
-    // Fetch expense for each budget
+      // Fetch expense for each budget
       for (const budget of updatedBudgets) {
-      const expenses = await fetchData(`expenses/${budget._id}`);
-      updatedExpenses.push(...expenses);
-    }
+        const expenses = await fetchData(`expenses/${budget._id}`);
+        updatedExpenses.push(...expenses);
+      }
 
-    // Update the state with refreshed data
+      // Update the state with refreshed data
       setRefreshedBudgets(updatedBudgets);
       setRefreshedExpenses(updatedExpenses);
     } catch (error) {
@@ -45,27 +47,33 @@ const Dashboard = () => {
   useEffect(() => {
     // Initialize the app and fetch the user data based on login status
     const loadData = async () => {
-      const data = await mainLoader();
-      console.log('Fetched data:', data); // Log the fetched data
-      setUserData(data); // Set the user data once fetched
+      setLoading(true); // Start loading while fetching the data
+      try {
+        const data = await mainLoader();
+        console.log("Fetched data:", data); // Log the fetched data
+        setUserData(data); // Set the user data once fetched
+      } catch (error) {
+        console.error("Error loading data:", error);
+      } finally {
+        setLoading(false); // Stop loading once the data is fetched or fails
+      }
     };
 
-    
     loadData(); // Call the initialization on component mount
 
     // Listen for storage changes
     const handleStorageChange = () => {
       const userId = localStorage.getItem("userId");
       if (!userId) {
-        setUserData({currentUserName: null, budgets: [], expenses: []})
+        setUserData({ currentUserName: null, budgets: [], expenses: [] });
       }
     };
 
-    window.addEventListener("storage", handleStorageChange)
+    window.addEventListener("storage", handleStorageChange);
 
     return () => {
-      window.removeEventListener("storage", handleStorageChange)
-    }
+      window.removeEventListener("storage", handleStorageChange);
+    };
   }, []);
 
   useEffect(() => {
@@ -76,6 +84,11 @@ const Dashboard = () => {
 
   const { currentUserName, budgets, expenses } = userData; // Destructure user data
   
+  if (loading) {
+    // Show a loading spinner or some loading indicator while fetching the data
+    return <div>Loading...</div>;
+  }
+
   return (
     <>
       {currentUserName ? (

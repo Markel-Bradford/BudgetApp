@@ -18,7 +18,10 @@ export async function mainLoader() {
   try {
     // Fetch the current user data from localStorage
     const userId = localStorage.getItem("userId");
-  
+    if (!userId) {
+      return { currentUserName: null, budgets: [], expenses: [] };
+    }
+    
     // Fetch the user data if userId is available
     const currentUserName = userId ? await fetchData(`users/${userId}`) : null;  
     
