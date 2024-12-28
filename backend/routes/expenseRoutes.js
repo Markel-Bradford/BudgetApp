@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Expense = require('../models/Expense');
-const { findByIdAndUpdate } = require('../models/User');
+const Budget = require('../models/Budget');
 
 
 // Add new expense
@@ -9,17 +9,27 @@ router.post('/', async (req, res) => {
     const { budgetsId, name, amount} = req.body;
     try {
         const expense = await Expense.create({ budgetsId, name, amount });
+        console.log('Created expense:', expense);
 
         // Calculate the total spent for the budget
         const expenses = await Expense.find({budgetsId})
-        const totalSpent = expenses.reduce((sum, expense) => + expense.amount, 0)
+        const totalSpent = expenses.reduce((sum, expense) => sum + parseFloat(expense.amount || 0), 0);
+        console.log('Total spent for budget:', totalSpent);
 
         // Update corresponding budgets spent amout
+        const updatedBudget =
         await Budget.findByIdAndUpdate(budgetsId, {spent: totalSpent}, {new: true});
-        
+        if (!updatedBudget) {
+            throw new Error('Budget not found')
+        }
+        // Log to onfirm the update budget
+        console.log('Updated budget:', updatedBudget);
+        // Log expense to verify proper creation
+        console.log('Newly created expense:', expense);
         // Respond with newly created expense
         res.status(201).json(expense)
     } catch (error) {
+        console.error('Error while creating expense:', error.message);
         res.status(500).json({error: error.message});
     }
 });
