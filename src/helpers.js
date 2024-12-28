@@ -15,7 +15,14 @@ const BASE_URL = "https://budgetapp-37rv.onrender.com/api/"; // Base URL for API
 export const fetchData = async (endpoint) => {
   try {
     const response = await axios.get(`${BASE_URL}${endpoint}`);
-    return response.data;
+    
+    // Check if the response status is 200 (OK)
+    if (response.status === 200) {
+      return response.data;
+    } else {
+      console.error(`Failed to fetch data from ${endpoint}: ${response.statusText}`);
+      return []; // Return an empty array if there's an error status
+    }
   } catch (error) {
     console.error(`Error fetching data from ${endpoint}:`, error);
     return [];

@@ -17,34 +17,43 @@ import { fetchData } from "../helpers";
 export async function mainLoader() {
   try {
     // Fetch the current user data from localStorage
-    const userId = localStorage.getItem("userId");  // Assuming userId is stored in localStorage
-    // If not logged in, redirect to the sign-in screen
-
-    const currentUserName = userId ? await fetchData(`users/${userId}`) : null;  // Fetch the user data if userId is available
+    const userId = localStorage.getItem("userId");
+  
+    // Fetch the user data if userId is available
+    const currentUserName = userId ? await fetchData(`users/${userId}`) : null;  
     
     // Fetch all budgets from the backend
-    const budgets = userId ? (await fetchData(`budgets/${userId}`)) : [];  // Fetch all budgets
+    const budgets = userId ? (await fetchData(`budgets/${userId}`)) : [];
 
     // Fetch all expenses associated with the budgets (based on the budget IDs)
-    const expenses = budgets.length > 0
-      ? await Promise.all(
-          budgets.map((budget) => fetchData(`expenses/${budget._id}`))  // Fetch expenses for each budget
-        )
-      : [];  // If no budgets, no expenses to fetch
-    // Flatten the array of expenses to combine them into a single list
-    const flattenedExpenses = expenses.flat();
+    // Ensure each budget has an expenses array
+    const updatedBudgets = await Promise.all(budgets.map(async (budget) => {
+      try {
+      // Fetch expenses for current budget
+      const expenses = await fetchData(`expenses/${budget._id}`);
+      return {
+        ...budget,
+        expenses: Array.isArray(expenses) ? expenses : []  // Ensure expenses is always an array
+      };
+    } catch (error) {
+      console.error(`Error fetching expenses for budget ${budget._id}:`, error);
+          return {
+            ...budget,
+            expenses: [], // Fallback to empty array if fetching expenses fails
+          };
+    }
+    }));
 
     // Return the data to be used in the Dashboard component
     return {
       currentUserName,
-      budgets,
-      expenses: flattenedExpenses,
+      budgets: updatedBudgets,
     };
   } catch (error) {
     console.error("Error loading data:", error);
     
     // Return default data if there's an error
-    return { currentUserName: null, budgets: [], expenses: [] };
+    return { currentUserName: null, budgets: [] };
   }
 }
 

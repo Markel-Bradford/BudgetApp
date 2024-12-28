@@ -6,6 +6,11 @@ const Budget = require('../models/Budget');
 
 // Add new expense
 router.post('/', async (req, res) => {
+    // Ensure that all required fields are present
+    if (!budgetsId || !name || !amount) {
+        return res.status(400).json({ error: 'Missing required fields (budgetsId, name, amount)' });
+    }
+    
     const { budgetsId, name, amount} = req.body;
     try {
         const expense = await Expense.create({ budgetsId, name, amount });
@@ -36,10 +41,17 @@ router.post('/', async (req, res) => {
 
 router.get('/:budgetsId', async (req, res) => {
     console.log(`Fetching expenses for budget ID: ${req.params.budgetsId}`);
+    
     try {
         const expenses = await Expense.find({ budgetsId: req.params.budgetsId});
+        
+        if (!expenses.length) {
+            console.log(`No expenses found for budget ID: ${req.params.budgetsId}`);
+        }
+        
         res.json(expenses)
     } catch (error) {
+        console.error('Error fetching expenses:', error.message);
         res.status(500).json({error: error.message});
     }
 });

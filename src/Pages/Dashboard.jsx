@@ -36,23 +36,39 @@ const Dashboard = () => {
       toast.error("Failed to refresh budgets and expenses.");
       console.error("Error refreshing data:", error);
     }
-  }, [userData.currentUserName.id]);
+  }, [userData.currentUserName?.id]);
 
   useEffect(() => {
     // Initialize the app and fetch the user data based on login status
     const loadData = async () => {
       const data = await mainLoader();
+      console.log('Fetched data:', data); // Log the fetched data
       setUserData(data); // Set the user data once fetched
     };
 
     
     loadData(); // Call the initialization on component mount
+
+    // Listen for storage changes
+    const handleStorageChange = () => {
+      const userId = localStorage.getItem("userId");
+      if (!userId) {
+        setUserData({currentUserName: null, budgets: [], expenses: []})
+      }
+    };
+
+    window.addEventListener("storage", handleStorageChange)
+
+    return () => {
+      window.removeEventListener("storage", handleStorageChange)
+    }
   }, []);
+
   useEffect(() => {
     if (userData.currentUserName.id) {
       refreshBudgets(); // Refresh only when user is present
     }
-  }, [userData.currentUserName.id]); // Trigger when user changes
+  }, [userData.currentUserName?.id]); // Trigger when user changes
 
   const { currentUserName, budgets, expenses } = userData; // Destructure user data
   
@@ -88,7 +104,7 @@ const Dashboard = () => {
                   ))}
                 </div>
 
-                <Expenses budgets={refreshedBudgets} />
+                <Expenses budgets={refreshedBudgets || []} />
               </div>
             ) : (
               <div>

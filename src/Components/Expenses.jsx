@@ -3,6 +3,8 @@ import { deleteItem, fetchData, updateSpentAmount } from "../helpers";
 import { TrashIcon } from "@heroicons/react/24/solid";
 
 const Expenses = ({ budgets, refreshData }) => {
+  console.log("Budgets passed to Expenses:", budgets); // Add this log to verify the data
+  
   const handleDeleteExpense = async (expenseId, budgetId) => {
     try {
       await deleteItem({ type: "expenses", id: expenseId });
@@ -32,6 +34,12 @@ const BudgetWithExpenses = ({ budget, refreshData, onDeleteExpense }) => {
   const [isExpanded, setIsExpanded] = React.useState(false);
   const toggleExpenses = () => setIsExpanded(!isExpanded);
 
+  console.log("Budget object:", budget); // Log the budget object
+
+  const expenses = Array.isArray(budget.expenses) ? budget.expenses : [];
+  console.log(expenses)
+  console.log("Expenses in each budget:", budget.expenses);
+
   return (
     <div className="budgetExpenseList">
       <h3 className="budgetListName" onClick={toggleExpenses}>
@@ -39,7 +47,7 @@ const BudgetWithExpenses = ({ budget, refreshData, onDeleteExpense }) => {
       </h3>
       {isExpanded && (
         <ul className="expenseList">
-          {budget.expenses.map((expense) => (
+          {expenses.map((expense) => (
             <ExpenseItem
               key={expense._id}
               expense={expense}
