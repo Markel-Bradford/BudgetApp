@@ -4,13 +4,14 @@ import {
 } from "../helpers";
 import { TrashIcon } from "@heroicons/react/24/solid";
 
-const Expenses = ({ budgets }) => {
+const Expenses = ({ budgets, refreshBudgets }) => {
   console.log("Budgets passed to Expenses:", budgets); // Add this log to verify the data
 
   const handleDeleteExpense = async (expenseId, budgetId, amount) => {
     try {
       // Delete the expense and update the budget amount
       await deleteExpenseAndUpdateBudget(expenseId, budgetId, amount);
+      refreshBudgets()
     } catch (error) {
       console.error("Error deleting expense:", error);
     }
@@ -30,7 +31,7 @@ const Expenses = ({ budgets }) => {
   );
 };
 
-const BudgetWithExpenses = ({ budget, onDeleteExpense }) => {
+const BudgetWithExpenses = ({ budget, onDeleteExpense, refreshBudgets }) => {
   const [isExpanded, setIsExpanded] = React.useState(false);
   const toggleExpenses = () => setIsExpanded(!isExpanded);
 
@@ -53,6 +54,7 @@ const BudgetWithExpenses = ({ budget, onDeleteExpense }) => {
               expense={expense}
               budgetId={budget._id}
               onDeleteExpense={onDeleteExpense}
+              refreshBudgets={refreshBudgets}
             />
           ))}
         </ul>
