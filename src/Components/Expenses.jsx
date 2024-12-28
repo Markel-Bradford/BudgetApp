@@ -5,10 +5,9 @@ import { TrashIcon } from "@heroicons/react/24/solid";
 const Expenses = ({ budgets, refreshData }) => {
   console.log("Budgets passed to Expenses:", budgets); // Add this log to verify the data
   
-  const handleDeleteExpense = async (expenseId, budgetId) => {
+  const handleDeleteExpense = async (expenseId) => {
     try {
       await deleteItem({ type: "expenses", id: expenseId });
-      await updateSpentAmount(budgetId);
       refreshData();
     } catch (error) {
       console.error("Error deleting expense:", error);
@@ -64,7 +63,7 @@ const BudgetWithExpenses = ({ budget, refreshData, onDeleteExpense }) => {
 const ExpenseItem = ({ expense, budgetId, onDeleteExpense }) => {
   const handleDelete = () => {
     if (window.confirm(`Delete expense "${expense.name}"?`)) {
-      onDeleteExpense(expense.id, budgetId);
+      onDeleteExpense(expense._id, budgetId);
     }
   };
 

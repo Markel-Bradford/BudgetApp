@@ -22,6 +22,15 @@ const AddBudgetForm = ({ userId, refreshBudgets }) => {
       return;
     }
 
+    if (!budgetName.trim()) {
+      toast.error("Budget name is required.");
+      return;
+  }
+  if (isNaN(amount) || amount <= 0) {
+      toast.error("Amount must be a positive number.");
+      return;
+  }
+
     if (action === "createBudget") {
       // Handle create account
       try {

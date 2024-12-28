@@ -16,20 +16,36 @@ const AddExpenseForm = ({ budgets, refreshBudgets }) => {
   const formRef = useRef();
   const focusRef = useRef();
 
+  const validateForm = () => {  
+    if (!expenseName || !expenseAmount) {
+      toast.error("Expense name and amount are required.");
+      return false;
+    }
+
+    if (isNaN(expenseAmount) || expenseAmount <= 0) {
+      toast.error("Amount must be a positive number.");
+      return false;
+    }
+    if (!selectedBudgetId) {
+      toast.error("Please select a budget.");
+      return false;
+    }
+    return true
+  }
+
+
   const handleExpenseFormSubmit = async (e) => {
     e.preventDefault();
     const action = e.nativeEvent.submitter.getAttribute("data-action");
-
-    if (!expenseName || !expenseAmount) {
-      toast.error("Budget name and amount are required.");
-      return;
-    }
+    // Validate correct form inputs
+    
+    if (!validateForm()) return;
 
     if (action === "createExpense") {
       // Handle create account
       try {
         const payload = {
-          budgetsId: selectedBudgetId,
+          budgetId: selectedBudgetId,
           name: expenseName,
           amount: parseFloat(expenseAmount),
         };
@@ -43,7 +59,11 @@ const AddExpenseForm = ({ budgets, refreshBudgets }) => {
         refreshBudgets()
       } catch (error) {
         console.error("Error creating expense:", error);
-        toast.error("Expense creation failed. Please try again.");
+        if (error.response?.status === 400) {
+          toast.error("Invalid input. Please check your data.");
+        } else {
+          toast.error("Expense creation failed. Please try again.");
+        }
       }
     }
   };
@@ -52,7 +72,14 @@ const AddExpenseForm = ({ budgets, refreshBudgets }) => {
     setSelectedBudgetId(e.target.value);
   };
 
-  // If form is not submitting, the form will be reset.
+  useEffect(() => {
+    if (budgets.length === 1) {
+      setSelectedBudgetId(budgets[0]._id);
+    } else if (!budgets.find((b) => b._id === selectedBudgetId)) {
+      setSelectedBudgetId("");
+    }
+  }, [budgets, selectedBudgetId]);
+
   useEffect(() => {
     if (!isSubmitting) {
       formRef.current.reset();
@@ -112,6 +139,7 @@ const AddExpenseForm = ({ budgets, refreshBudgets }) => {
             value={selectedBudgetId}
             onChange={handleBudgetChange}
             required>
+              <option value="" disabled>Select a budget</option>
             {budgets.map((budget) => {
               return (
                 <option key={budget._id} value={budget._id}>
