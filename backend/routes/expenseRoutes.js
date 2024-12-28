@@ -57,32 +57,35 @@ router.post("/", async (req, res) => {
 
 router.delete("/:expenseId", async (req, res) => {
   console.log(`Expense deleted for expense ID: ${req.params.expenseId}`);
-  const { budgetId, amount } = req.body;
+  const expenseId = req.params.expenseId;
   
   try {
+    // Find the expense by ID
+    const expense = await Expense.findById(expenseId)
+    if (!expense) {
+        return res.status(404).json({error: "Expense not found"})
+    }
+
+
     // Find the budget by ID
-    const budget = await Budget.findById(budgetId);
+    const budget = await Budget.findById(expense.budgetId);
     if (!budget) {
       return res.status(404).json({ error: "Budget not found" });
     }
 
     const updatedBudget = await Budget.findByIdAndUpdate(
-        budgetId,
+        expense.budgetId,
         {
           $pull: { expenses: req.params.expenseId }, // Add the new expense ID to the expenses array
-          $inc: { spent: -amount }, // Decrement the spent amount
+          $inc: { spent: -expense.amount }, // Decrement the spent amount
         },
         { new: true }
       );
       if (!updatedBudget) {
-        throw new Error("Budget not found");
+        throw new Error("Failed to update budget");
       }  
-
-    const deleteExpenses = await Expense.deleteOne({_id: req.params.expenseId});
-
-    if (deleteExpenses.deletedCount === 0) {
-        return res.status(404).json({ error: "Expense not found" });
-    }
+    //   Delete the expense
+    await Expense.findByIdAndDelete(expenseId);
 
     console.log(`Expense deleted with ID: ${req.params.expenseId}`);
     res.status(200).json({ message: "Expense deleted successfully", updatedBudget });

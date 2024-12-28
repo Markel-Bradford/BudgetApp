@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { updateSpentAmount } from "../helpers";
+import { getRandomColor, updateSpentAmount } from "../helpers";
 
 const BudgetItem = ({ budget, expenses, refreshData }) => {
   const { _id, name, amount, color } = budget;

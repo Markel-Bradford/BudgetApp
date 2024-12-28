@@ -128,17 +128,17 @@ export const deleteItem = async ({ type, id }) => {
  * @returns {Promise<void>}
  */
 export const deleteExpenseAndUpdateBudget = async (expenseId, budgetId, amount) => {
+  
   try {
-    // First, delete the expense
+    // Debugging line to check what expenseId is
+    console.log("Deleting expense with ID:", expenseId);
+    
+    // Delete the expense
     await axios.delete(`${BASE_URL}expenses/${expenseId}`);
     toast.success("Expense deleted successfully!");
 
-    // Then, update the budget's spent amount
-    const expenses = await fetchData(`expenses/${budgetId}`);
-    const totalSpent = expenses.reduce((sum, expense) => sum + expense.amount, 0);
-
-    // Now, update the budget's spent value
-    await axios.patch(`${BASE_URL}budgets/${budgetId}`, { spent: totalSpent });
+    // Update the budget's spent value
+    await axios.patch(`${BASE_URL}budgets/${budgetId}`, { spent: amount });
     toast.info("Budget spent amount updated!");
 
   } catch (error) {
