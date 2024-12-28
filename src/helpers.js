@@ -137,34 +137,21 @@ export const deleteExpenseAndUpdateBudget = async (expenseId, budgetId, amount) 
     await axios.delete(`${BASE_URL}expenses/${expenseId}`);
     toast.success("Expense deleted successfully!");
 
-    // Update the budget's spent value
-    await axios.patch(`${BASE_URL}budgets/${budgetId}`, { spent: amount });
-    toast.info("Budget spent amount updated!");
+    // Fetch all expenses for the budget to recalculate the total spent
+    const budget = await axios.get(`${BASE_URL}budgets/${budgetId}`);
+    
+    // Ensure expenses are populated and not empty
+    const remainingExpenses = budget.data.expenses || [];
 
+    // Recalculate the total spent for the budget
+    const newSpentAmount = remainingExpenses.reduce((total, expense) => total + expense.amount, 0);
+    
+    // Update the budget's spent value
+    await axios.patch(`${BASE_URL}budgets/${budgetId}`, { spent: newSpentAmount });
+    toast.info("Budget spent amount updated!");
   } catch (error) {
     console.error("Error deleting expense and updating budget:", error);
     toast.error("Failed to delete expense and update budget.");
-  }
-};
-
-/**
- * Update the spent amount for a specific budget.
- * @param {string} budgetId - The ID of the budget to update.
- * @returns {Promise<void>}
- */
-export const updateSpentAmount = async (budgetId, expenseId) => {
-  try {
-    const expenses = await fetchData(`expenses/${budgetId}`);
-    const totalSpent = expenses.reduce(
-      (sum, expense) => sum + expense.amount,
-      0
-    );
-
-    await axios.patch(`${BASE_URL}budgets/${expenseId}`, { spent: totalSpent });
-    toast.info("Spent amount updated!");
-  } catch (error) {
-    console.error("Error updating spent amount:", error);
-    toast.error("Failed to update spent amount. Please try again.");
   }
 };
 

@@ -11,7 +11,9 @@ const Expenses = ({ budgets, refreshBudgets }) => {
     try {
       // Delete the expense and update the budget amount
       await deleteExpenseAndUpdateBudget(expenseId, budgetId, amount);
-      refreshBudgets()
+   
+      // Refresh the budgets and expenses data
+      refreshBudgets();
     } catch (error) {
       console.error("Error deleting expense:", error);
     }
@@ -31,7 +33,7 @@ const Expenses = ({ budgets, refreshBudgets }) => {
   );
 };
 
-const BudgetWithExpenses = ({ budget, onDeleteExpense, refreshBudgets }) => {
+const BudgetWithExpenses = ({ budget, onDeleteExpense, refreshBudgets  }) => {
   const [isExpanded, setIsExpanded] = React.useState(false);
   const toggleExpenses = () => setIsExpanded(!isExpanded);
 
@@ -44,7 +46,7 @@ const BudgetWithExpenses = ({ budget, onDeleteExpense, refreshBudgets }) => {
   return (
     <div className="budgetExpenseList">
       <h3 className="budgetListName" onClick={toggleExpenses}>
-        {budget.name} ({budget.spent})
+        {budget.name} (${budget.spent})
       </h3>
       {isExpanded && (
         <ul className="expenseList">
@@ -54,7 +56,7 @@ const BudgetWithExpenses = ({ budget, onDeleteExpense, refreshBudgets }) => {
               expense={expense}
               budgetId={budget._id}
               onDeleteExpense={onDeleteExpense}
-              refreshBudgets={refreshBudgets}
+              refreshBudgets={refreshBudgets} // Pass refresh function here as well
             />
           ))}
         </ul>

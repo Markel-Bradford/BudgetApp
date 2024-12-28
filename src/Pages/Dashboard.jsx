@@ -26,10 +26,14 @@ const Dashboard = () => {
     try {
       const updatedBudgets = (await fetchData(`budgets/${userData.currentUserName.id}`)) || [];
       const updatedExpenses = [];
-    for (const budget of updatedBudgets) {
+    
+    // Fetch expense for each budget
+      for (const budget of updatedBudgets) {
       const expenses = await fetchData(`expenses/${budget._id}`);
       updatedExpenses.push(...expenses);
     }
+
+    // Update the state with refreshed data
       setRefreshedBudgets(updatedBudgets);
       setRefreshedExpenses(updatedExpenses);
     } catch (error) {
@@ -100,11 +104,12 @@ const Dashboard = () => {
                       key={budget._id}
                       budget={budget}
                       expenses={refreshedExpenses}
+                      refreshBudgets={refreshBudgets}
                     />
                   ))}
                 </div>
 
-                <Expenses budgets={refreshedBudgets || []} />
+                <Expenses budgets={refreshedBudgets || []} refreshBudgets={refreshBudgets} />
               </div>
             ) : (
               <div>
@@ -112,7 +117,7 @@ const Dashboard = () => {
                   Take the first steps towards achieving financial freedom.
                   Create a new budget!
                 </p>
-                <AddBudgetForm userId={currentUserName.id} />
+                <AddBudgetForm userId={currentUserName.id} refreshBudgets={refreshBudgets} />
               </div>
             )}
           </div>

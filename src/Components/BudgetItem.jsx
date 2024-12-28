@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { getRandomColor, updateSpentAmount } from "../helpers";
 
-const BudgetItem = ({ budget, expenses, refreshData }) => {
+const BudgetItem = ({ budget, expenses }) => {
   const { _id, name, amount, color } = budget;
   const [totalSpent, setTotalSpent] = useState(0);
 
@@ -9,7 +8,7 @@ const BudgetItem = ({ budget, expenses, refreshData }) => {
     const calculateSpent = async () => {
       try {
         // Filter expenses for current budget
-        const budgetExpenses = expenses.filter((expense) => expense.budgetsId === _id);
+        const budgetExpenses = expenses.filter((expense) => expense.budgetId === _id);
         // Calculate total spent for this budget
         const updatedSpent = budgetExpenses.reduce((total, expense) => total + expense.amount, 0);
         
