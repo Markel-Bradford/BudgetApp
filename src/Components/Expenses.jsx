@@ -21,7 +21,7 @@ const Expenses = ({ budgets, refreshBudgets }) => {
 
   return (
     <div className="budgetList">
-      <h2 className="sectionTitle">Budget Expense List</h2>
+      <h2 className="sectionTitle listOfBudgets">Budget Expense List</h2>
       {budgets.map((budget) => (
         <BudgetWithExpenses
           key={budget._id}

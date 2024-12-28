@@ -108,7 +108,6 @@ const Dashboard = () => {
                     />
                   ))}
                 </div>
-
                 <Expenses budgets={refreshedBudgets || []} refreshBudgets={refreshBudgets} />
               </div>
             ) : (

@@ -798,6 +798,11 @@ small {
 }
 
 /* Budget List */
+
+.listOfBudgets {
+  margin-bottom: 40px;
+}
+
 .budgetList {
   margin: 25px 0;
 }
