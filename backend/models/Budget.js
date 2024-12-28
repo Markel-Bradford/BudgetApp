@@ -9,6 +9,4 @@ const BudgetSchema = new mongoose.Schema({
     expenses: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Expense' }]
 });
 
-Budget.find({ userId }).populate('expenses');
-
 module.exports = mongoose.model( 'Budget', BudgetSchema)
