@@ -69,7 +69,7 @@ const Dashboard = () => {
         {budgets.length > 0 ? (
           <div className="grid-lg">
             <div className="flex-lg">
-              <AddBudgetForm />
+              <AddBudgetForm userId={currentUserName._id}/>
               <AddExpenseForm budgets={budgets}/>
             </div>
             <h2 className="sectionTitle">Current Budgets</h2>
@@ -84,7 +84,7 @@ const Dashboard = () => {
         ) : (
           <div>
             <p id="getstarted">Take the first steps towards achieving financial freedom. Create a new budget!</p>
-            <AddBudgetForm />
+            <AddBudgetForm userId={currentUserName._id}/>
           </div>
 	)}
       </div>

@@ -10,6 +10,7 @@ router.post('/', async (req, res) => {
         const budget = await Budget.create({userId, name, amount, color});
         res.status(201).json(budget);
     } catch (error) {
+        console.error("Error creating budget:", error)
         res.status(500).json({error: error.message});
     }
 });
