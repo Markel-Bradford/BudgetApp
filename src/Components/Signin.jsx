@@ -20,8 +20,8 @@ const Signin = () => {
   useEffect(() => {
     const handleLoad = () => {
       toast.info(
-        "Please feel free to sign in using the guest credentials to explore the app and test functionality: Name - Guest | Email - guest.player1086@gmail.com  You can also enter your own credentials to create a personal account!",
-        { autoClose: 8000 } // Optional: Prevent toast from auto-closing
+        "For guests, please press sign in to use the current credentials. Otherwise, input your name and email to create an account or sign in.",
+        { autoClose: 12000 } // Optional: Prevent toast from auto-closing
       );
     };
 
