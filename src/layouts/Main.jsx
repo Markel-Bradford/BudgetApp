@@ -8,6 +8,8 @@ import Navbar from "../Components/Navbar";
 
 // Import fetchData helper
 import { fetchData } from "../helpers";
+import Footer from "../Components/Footer";
+
 
 // loader
 /**
@@ -70,7 +72,9 @@ const Main = () => {
       <Navbar userName={currentUserName} />
       <main>
         <Outlet context={{ budgets }} />
+      <Footer />
       </main>
+      
     </div>
   );
 };

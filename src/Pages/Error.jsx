@@ -1,10 +1,23 @@
 import { ArrowUturnLeftIcon, HomeIcon } from '@heroicons/react/24/solid';
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { useRouteError, Link, useNavigate } from 'react-router-dom'
 
 const Error = () => {
   const error = useRouteError();
-  const goBack = useNavigate()
+  const goBack = useNavigate();
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setIsLoading(false); // Allow the error message to display after timeout
+    }, 3000)
+
+    return () => clearTimeout(timeout); // Cleanup timeout on unmount
+  }, []);
+
+  if (isLoading) {
+    return <div className='loadingSpinner'><img src="/BudgetApp/images/spinner.svg" className='spinner' alt="Loading spinner" /></div>;
+  }
 
   return (
     <div className='error'>

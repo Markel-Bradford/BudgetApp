@@ -1,5 +1,5 @@
 :root {
-  background: linear-gradient(90deg, #333 0%, #000 100%);;
+  background: linear-gradient(90deg, #333 0%, #000 100%);
 
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -31,20 +31,19 @@
   --bkg: 190 60% 98%;
 }
 
-
-
 /*General CSS*/
 
-
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
 body {
--webkit-text-size-adjust: 100%;
-width: 100%;
+  -webkit-text-size-adjust: 100%;
+  width: 100%;
 }
 
 main {
@@ -86,7 +85,7 @@ p {
 }
 
 .accent {
-  color: #FFD700;
+  color: #ffd700;
 }
 
 .flex-lg {
@@ -157,9 +156,6 @@ main {
   place-items: start;
 }
 
-
-
-
 /*Navbar CSS*/
 .navbar {
   background: linear-gradient(90deg, #333 0%, #000 100%);
@@ -195,8 +191,8 @@ main {
 }
 
 .navbar-logo:hover {
-  color: #FFD700;
-  transition: all .2s ease-out;
+  color: #ffd700;
+  transition: all 0.2s ease-out;
 }
 
 .fa-code-commit {
@@ -221,12 +217,12 @@ main {
 }
 
 .btn {
-  background: rgba(255, 69, 0, .9);
+  background: rgba(255, 69, 0, 0.9);
   color: #fff;
   display: flex;
   align-items: center;
   text-decoration: none;
-  padding: .5rem 1rem;
+  padding: 0.5rem 1rem;
   height: 100%;
   border: solid 2px #fff;
   border-radius: 12px;
@@ -237,7 +233,7 @@ main {
   background-color: red;
   color: var(--color);
   border: black 2px solid;
-  transition: .3s;
+  transition: 0.3s;
 }
 
 .btn--info {
@@ -245,8 +241,8 @@ main {
 }
 
 .btn--info:hover {
-  background: #FFD700;
-  transition: .3s;
+  background: #ffd700;
+  transition: 0.3s;
 }
 
 @media screen and (max-width: 1024px) {
@@ -272,11 +268,7 @@ main {
     height: 50px;
     margin-top: 15px;
   }
-
 }
-
-
-
 
 /*Error page styles */
 
@@ -310,7 +302,7 @@ main {
   text-decoration: none;
   transition: border-color 0.25s;
   margin: 0 auto;
-  padding: 0rem .5rem;
+  padding: 0rem 0.5rem;
   height: 60px;
   display: -webkit-box;
   display: -ms-flexbox;
@@ -325,14 +317,24 @@ main {
   cursor: pointer;
 }
 
-
 .btn--err:hover {
   background: green;
   color: #fff;
 }
 
+.loadingSpinner {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
-
+.spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 50%;
+}
 
 /*Dashboard CSS*/
 
@@ -372,8 +374,6 @@ main {
     font-size: 2.3em;
   }
 }
-
-
 
 /*Signin CSS */
 
@@ -421,7 +421,7 @@ main {
 }
 
 #welcomeMessage {
-    margin-bottom: 20px;
+  margin-bottom: 20px;
 }
 
 #password,
@@ -443,8 +443,6 @@ main {
   justify-content: space-around;
   width: 100%;
 }
-
-
 
 .submitbutton {
   width: 60%;
@@ -564,9 +562,6 @@ main {
   }
 }
 
-
-
-
 /*Budget Form CSS*/
 
 .form-wrapper {
@@ -592,7 +587,7 @@ main {
   content: "";
   border: 3px solid #0a536d;
   position: absolute;
-  inset: .1rem;
+  inset: 0.1rem;
   z-index: 1;
   border-radius: 9px;
 }
@@ -603,7 +598,9 @@ label {
   font-weight: bold;
 }
 
-#newBudget, #newBudgetAmount, #budgetSelect {
+#newBudget,
+#newBudgetAmount,
+#budgetSelect {
   margin: 0 auto;
   width: 90%;
   border-radius: 4px;
@@ -621,7 +618,7 @@ label {
   height: 40px;
   border-radius: 8px;
   transition: border-color 0.25s;
-  transition: color .25s;
+  transition: color 0.25s;
   cursor: pointer;
   display: -webkit-box;
   display: -ms-flexbox;
@@ -639,9 +636,6 @@ label {
   border: 3px solid green;
 }
 
-
-
-
 /*Expense Form*/
 
 .exp-inputs {
@@ -654,10 +648,10 @@ label {
 #budgetSelect {
   height: 2rem;
   width: 97%;
-  
 }
 
-#newExpense, #newExpenseAmount {
+#newExpense,
+#newExpenseAmount {
   margin: 0 auto;
   width: 90%;
   border-radius: 4px;
@@ -666,18 +660,15 @@ label {
   border: 2px solid black;
 }
 
-
-
-
 /*Budget Card CSS */
 .currentBudgets {
-    display: -webkit-box;
-    display: -ms-flexbox;
-    display: flex;
-    -ms-flex-wrap: wrap;
-    flex-wrap: wrap;
-    gap: var(--space-md);
-    margin: 0 auto;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+  margin: 0 auto;
 }
 
 .budget {
@@ -774,7 +765,7 @@ small {
   .budgetName {
     font-size: 22px;
   }
-  
+
   .budgAmount {
     font-size: 15px;
   }
@@ -792,7 +783,7 @@ small {
   content: "";
   border: 3px solid #0a536d;
   position: absolute;
-  inset: .1rem;
+  inset: 0.1rem;
   z-index: 1;
   border-radius: 9px;
 }
@@ -811,15 +802,15 @@ small {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  border: #FFD700 2px solid;
+  border: #ffd700 2px solid;
   border-radius: 16px;
-  padding:0 20px 25px 20px;
+  padding: 0 20px 25px 20px;
   color: #ffffff;
 }
 
 .expenseList {
   opacity: 1;
-  transition: all .5s ease;
+  transition: all 0.5s ease;
 }
 
 .expenseListHidden {
@@ -843,10 +834,57 @@ small {
   flex-direction: column;
   color: #ffffff;
   padding: 8px 0;
-  border-bottom: #FFFFFF 2px solid;
+  border-bottom: #ffffff 2px solid;
 }
 
 .expenseDetails {
   display: flex;
   justify-content: space-between;
+}
+
+/* Footer Styles */
+.footer {
+  background: linear-gradient(90deg, #333 0%, #000 100%);
+  height: 80px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: .6rem;
+  bottom: 0;
+  color: #eee;
+  z-index: 999;
+  font-family: "Audiowide", sans-serif;
+  border-top: 2px #fff solid;
+  width: 100%;
+  margin-top: 100px;
+}
+
+.footer-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 80px;
+  max-width: 100%;
+}
+
+.footer-name {
+  color: #fff;
+  font-family: "Kalnia", sans-serif;
+  font-size: 1.1rem;
+}
+
+.footerLink {
+  color: #ffd700;
+  text-decoration: none;
+}
+
+.footerLink:hover {
+  color: #ffffff;
+  text-decoration: underline;
+}
+
+@media screen and (max-width: 960px) {
+  .footer {
+    text-align: center;
+  }
 }

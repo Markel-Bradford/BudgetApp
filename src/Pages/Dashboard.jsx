@@ -88,7 +88,7 @@ const Dashboard = () => {
 
   // Render the loading screen until data is fetched
   if (loading) {
-    return <div style={{"display": "flex", "justifyContent": "center", "alignItems": "center"}}><img src="/BudgetApp/images/spinner.svg" style={{"width": "30%", "display": "flex"}} alt="Loading spinner" /></div>;
+    return <div className='loadingSpinner'><img src="/BudgetApp/images/spinner.svg" className="spinner" alt="Loading spinner" /></div>;
   }
 
   return (
