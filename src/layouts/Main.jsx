@@ -72,9 +72,8 @@ const Main = () => {
       <Navbar userName={currentUserName} />
       <main>
         <Outlet context={{ budgets }} />
-      <Footer />
       </main>
-      
+      <Footer />
     </div>
   );
 };
