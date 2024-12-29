@@ -156,6 +156,27 @@ export const deleteExpenseAndUpdateBudget = async (expenseId, budgetId, amount) 
 };
 
 /**
+ * Delete a budget from the database.
+ * @param {string} budgetId - The ID of the budget to delete.
+ * @returns {Promise<void>}
+ */
+export const deleteBudget = async (budgetId) => {
+  
+  try {
+    // Debugging line to check what expenseId is
+    console.log("Deleting budget with ID:", budgetId);
+    
+    // Delete the expense
+    await axios.delete(`${BASE_URL}budgets/${budgetId}`);
+    toast.success("Budget deleted successfully!");
+    
+  } catch (error) {
+    console.error("Error deleting budget:", error);
+    toast.error("Failed to delete budget.");
+  }
+};
+
+/**
  * Format a number as currency (USD).
  * @param {number} amount - The amount to format.
  * @returns {string} - The formatted currency string.
