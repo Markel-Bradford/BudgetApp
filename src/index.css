@@ -811,12 +811,12 @@ small {
 
 .expenseList {
   opacity: 1;
-  transition: all 0.5s ease;
+  transition: all ease 1s;
 }
 
 .expenseListHidden {
   opacity: 0;
-  transition: all ease;
+  transition: all ease 1s;
   position: absolute;
   top: -10%;
 }

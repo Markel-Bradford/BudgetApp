@@ -2,17 +2,21 @@ import { TrashIcon } from "@heroicons/react/24/solid";
 import React, { useEffect, useState } from "react";
 import { deleteBudget } from "../helpers";
 
-const BudgetItem = ({ budget, expenses, onDeleteBudget }) => {
+const BudgetItem = ({ budget, expenses, onDeleteBudget, refreshBudgets }) => {
   const { _id, name, amount, color } = budget;
   const [totalSpent, setTotalSpent] = useState(0);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = async () => {
     if (window.confirm(`Delete expense "${budget.name}"?`)) {
+      setIsDeleting(true);
       try {
         await deleteBudget(_id); // Call the deleteBudget helper
-        onDeleteBudget(_id); // Notify parent component to refresh data and state
+        refreshBudgets(); // Refresh the budgets and expenses data
       } catch (error) {
-        console.error("Error deleting budget:", error)
+        console.error("Error deleting budget:", error);
+      } finally {
+        setIsDeleting(false);
       }
     }
   };
@@ -49,7 +53,14 @@ const BudgetItem = ({ budget, expenses, onDeleteBudget }) => {
         <p className="budgAmount">
           Budget Amount: ${amount}{" "}
           <span>
-            <TrashIcon width={20} style={{ color: "red", cursor: "pointer" }} onClick={handleDelete} />
+            <TrashIcon
+              width={20}
+              style={{
+                color: "red",
+                cursor: isDeleting ? "not-allowed" : "pointer",
+              }}
+              onClick={isDeleting ? null : handleDelete}
+            />
           </span>
         </p>
       </div>
