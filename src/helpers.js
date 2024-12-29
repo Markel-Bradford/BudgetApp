@@ -133,22 +133,12 @@ export const deleteExpenseAndUpdateBudget = async (expenseId, budgetId, amount) 
     // Debugging line to check what expenseId is
     console.log("Deleting expense with ID:", expenseId);
     
-    // Delete the expense
-    await axios.delete(`${BASE_URL}expenses/${expenseId}`);
+    // Delete the expense and fetch the updated budget
+    const {data : updatedBudget} = await axios.delete(`${BASE_URL}expenses/${expenseId}`);
+    
     toast.success("Expense deleted successfully!");
 
-    // Fetch all expenses for the budget to recalculate the total spent
-    const budget = await axios.get(`${BASE_URL}budgets/${budgetId}`);
-    
-    // Ensure expenses are populated and not empty
-    const remainingExpenses = budget.data.expenses || [];
-
-    // Recalculate the total spent for the budget
-    const newSpentAmount = remainingExpenses.reduce((total, expense) => total + expense.amount, 0);
-    
-    // Update the budget's spent value
-    await axios.patch(`${BASE_URL}budgets/${budgetId}`, { spent: newSpentAmount });
-    toast.info("Budget spent amount updated!");
+    return updatedBudget;
   } catch (error) {
     console.error("Error deleting expense and updating budget:", error);
     toast.error("Failed to delete expense and update budget.");

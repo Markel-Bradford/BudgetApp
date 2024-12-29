@@ -20,7 +20,7 @@ const Signin = () => {
   useEffect(() => {
     const handleLoad = () => {
       toast.info(
-        "For guests, please press sign in to use the current credentials. Otherwise, input your name and email to create an account or sign in.",
+        "For guests, please press sign in to use the current credentials. Otherwise, input your name and email to create a new account or sign in if returning user.",
         { autoClose: 12000 } // Optional: Prevent toast from auto-closing
       );
     };

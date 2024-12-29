@@ -1,24 +1,27 @@
 import React, { useState } from "react";
-import {
-  deleteExpenseAndUpdateBudget
-} from "../helpers";
+import { deleteExpenseAndUpdateBudget } from "../helpers";
 import { TrashIcon } from "@heroicons/react/24/solid";
 
 const Expenses = ({ budgets, refreshBudgets }) => {
-  
-  
   console.log("Budgets passed to Expenses:", budgets); // Add this log to verify the data
 
-  const handleDeleteExpense = async (expenseId, budgetId, amount) => {
+  const handleDeleteExpense = async (expenseId, budgetId) => {
     try {
       // Delete the expense and update the budget amount
-      await deleteExpenseAndUpdateBudget(expenseId, budgetId, amount);
-   
+      const updatedBudget = await deleteExpenseAndUpdateBudget(
+        expenseId,
+        budgetId
+      );
+
       // Refresh the budgets and expenses data
-      refreshBudgets();
+      refreshBudgets((prevBudgets) =>
+        prevBudgets.map((budget) =>
+          budget._id === updatedBudget._id ? updatedBudget : budget
+        )
+      );
     } catch (error) {
       console.error("Error deleting expense:", error);
-    } 
+    }
   };
 
   return (
@@ -35,7 +38,7 @@ const Expenses = ({ budgets, refreshBudgets }) => {
   );
 };
 
-const BudgetWithExpenses = ({ budget, onDeleteExpense, refreshBudgets  }) => {
+const BudgetWithExpenses = ({ budget, onDeleteExpense, refreshBudgets }) => {
   const [isExpanded, setIsExpanded] = React.useState(false);
   const toggleExpenses = () => setIsExpanded(!isExpanded);
 
@@ -48,8 +51,10 @@ const BudgetWithExpenses = ({ budget, onDeleteExpense, refreshBudgets  }) => {
   return (
     <div className="budgetExpenseList">
       <h3 className="budgetListName" onClick={toggleExpenses}>
-        <span>{budget.name} (${budget.spent.toFixed(2)})</span> 
-        <span>{isExpanded ?  <>&#9650;</> : <>&#9660;</>}</span>
+        <span>
+          {budget.name} (${budget.spent.toFixed(2)})
+        </span>
+        <span>{isExpanded ? <>&#9650;</> : <>&#9660;</>}</span>
       </h3>
       {isExpanded && (
         <ul className="expenseList">
@@ -78,25 +83,27 @@ const ExpenseItem = ({ expense, budgetId, onDeleteExpense }) => {
       } catch (error) {
         console.error("Error deleting expense:", error);
       } finally {
-        setIsDeleting(false)
+        setIsDeleting(false);
       }
     }
   };
 
   return (
     <div className="expenseDetailsContainer">
-    <li className="expenseDetails">
-      <span>Expense: {expense.name}</span>
-      <span>${expense.amount.toFixed(2)}</span>
-      
-      <span>
-        <TrashIcon
-          width={20}
-          style={{ color: "red", cursor: isDeleting ? "not-allowed" : "pointer" }}
-          onClick={isDeleting ? null : handleDelete}
-        />
-      </span>
-    </li>
+      <li className="expenseDetails">
+        <span>Expense: {expense.name}</span>
+        <span>${expense.amount.toFixed(2)}</span>
+        <span>
+          <TrashIcon
+            width={20}
+            style={{
+              color: "red",
+              cursor: isDeleting ? "not-allowed" : "pointer",
+            }}
+            onClick={isDeleting ? null : handleDelete}
+          />
+        </span>
+      </li>
     </div>
   );
 };
