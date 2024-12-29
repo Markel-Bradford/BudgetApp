@@ -20,12 +20,12 @@ const Signin = () => {
   useEffect(() => {
     const handleLoad = () => {
       toast.info(
-        "Please feel free to sign in using the guest credentials to test functionality. \n Name: Guest \nEmail: guest.player1086@gmail.com \n You can also enter your own credentials to create a personal account!",
-        { autoClose: false } // Optional: Prevent toast from auto-closing
+        "Please feel free to sign in using the guest credentials to explore the app and test functionality: Name - Guest | Email - guest.player1086@gmail.com  You can also enter your own credentials to create a personal account!",
+        { autoClose: 8000 } // Optional: Prevent toast from auto-closing
       );
     };
 
-    const timeout = setTimeout(handleLoad, 2000);
+    const timeout = setTimeout(handleLoad, 1500);
     
 
     return () => {
