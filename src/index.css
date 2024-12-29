@@ -857,7 +857,7 @@ small {
   font-family: "Audiowide", sans-serif;
   border-top: 2px #fff solid;
   width: 100%;
-  margin-top: 100px;
+  margin-top: 250px;
 }
 
 .footer-container {
@@ -887,5 +887,9 @@ small {
 @media screen and (max-width: 960px) {
   .footer {
     text-align: center;
+  }
+
+  .footer-name{
+    font-size: .9rem;
   }
 }
