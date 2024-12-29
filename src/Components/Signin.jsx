@@ -20,17 +20,16 @@ const Signin = () => {
   useEffect(() => {
     const handleLoad = () => {
       toast.info(
-        "Please feel free to sign in using the guest credentials to test functionality. \n"+
-        "Name: Guest \n" +
-        "Email: guest.player1086@gmail.com \n" +
-        "You can also enter your own credentials to create a personal account!"
+        "Please feel free to sign in using the guest credentials to test functionality. \n Name: Guest \nEmail: guest.player1086@gmail.com \n You can also enter your own credentials to create a personal account!",
+        { autoClose: false } // Optional: Prevent toast from auto-closing
       );
     };
 
-    window.onload = handleLoad;
+    const timeout = setTimeout(handleLoad, 2000);
+    
 
     return () => {
-      window.onload = null; // Clean up event listen upon dismount
+      clearTimeout(timeout); // Cleanup timeout on unmount
     }
   }, [])
 
