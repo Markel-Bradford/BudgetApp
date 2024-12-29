@@ -19,7 +19,7 @@ const Signin = () => {
   
   useEffect(() => {
     const handleLoad = () => {
-      alert(
+      toast.info(
         "Please feel free to sign in using the guest credentials to test functionality. \n"+
         "Name: Guest \n" +
         "Email: guest.player1086@gmail.com \n" +
