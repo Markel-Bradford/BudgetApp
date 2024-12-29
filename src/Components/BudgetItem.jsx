@@ -8,7 +8,7 @@ const BudgetItem = ({ budget, expenses, onDeleteBudget, refreshBudgets }) => {
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = async () => {
-    if (window.confirm(`Delete expense "${budget.name}"?`)) {
+    if (window.confirm(`Delete budget "${budget.name}"?`)) {
       setIsDeleting(true);
       try {
         await deleteBudget(_id); // Call the deleteBudget helper
