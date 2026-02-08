@@ -33,7 +33,7 @@ export const fetchData = async (endpoint) => {
 /**
  * Create a new user.
  * @param {object} user - The user data to be created.
- * @returns {Promise<void>}
+ * @returns {Promise<object>} The created user data.
  */
 export const newUser = async (user) => {
   try {
@@ -41,9 +41,10 @@ export const newUser = async (user) => {
     
     localStorage.setItem("userId", response.data._id);
     toast.success("User created successfully!");
+    return { id: response.data._id, name: response.data.name, email: response.data.email };
   } catch (error) {
-    
     toast.error("Failed to create user. Please try again.");
+    throw error;
   }
 };
 

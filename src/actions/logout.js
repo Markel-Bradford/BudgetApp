@@ -19,13 +19,14 @@ export async function logoutAction() {
         // Display success toast notification
         toast.success("You've successfully logged out!");
         
-        // Redirect after logout
-        return redirect("/");
+        // Hard reload to reset auth state
+        window.location.href = "/BudgetApp";
     } catch (error) {
         console.error("Logout error:", error);
         // Clear localStorage anyway if logout fails
         localStorage.removeItem("userId");
         toast.error("Logout completed. Please refresh if needed.");
-        return redirect("/");
+        // Hard reload to reset auth state
+        window.location.href = "/BudgetApp";
     }
 }

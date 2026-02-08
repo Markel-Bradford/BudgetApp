@@ -5,6 +5,7 @@ import {
   UserPlusIcon,
 } from "@heroicons/react/24/solid";
 import { loginUser, newUser } from "../helpers";
+import { useAuth } from "../context/AuthContext";
 import axios from "axios";
 import { toast } from "react-toastify";
 
@@ -12,6 +13,7 @@ const Signin = () => {
   const [usernameInput, setUsernameInput] = useState("Guest");
   const [emailInput, setEmailInput] = useState("guest.player1086@gmail.com");
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   // Auto-populate and clear the input when clicked
   const handleFocus = (e) => {
@@ -47,8 +49,8 @@ const Signin = () => {
       // Handle create account
       try {
         if ((usernameInput.trim(), emailInput.trim())) {
-          newUser({ name: usernameInput.trim(), email: emailInput.trim() });
-
+          const userData = await newUser({ name: usernameInput.trim(), email: emailInput.trim() });
+          login(userData); // Update auth context
           navigate("/dashboard"); // Redirect to dashboard after signup
         } else {
           toast.error("Sign-in failed. Please try again.");
@@ -59,7 +61,6 @@ const Signin = () => {
     } else if (action === "signin") {
       if (!usernameInput.trim() || !emailInput.trim()) {
         toast.error("Name and email required.");
-
         return;
       }
 
@@ -67,11 +68,11 @@ const Signin = () => {
       try {
         // Check if user exists
         if ((usernameInput.trim(), emailInput.trim())) {
-          await loginUser({
+          const userData = await loginUser({
             name: usernameInput.trim(),
             email: emailInput.trim(),
           });
-
+          login(userData); // Update auth context
           navigate("/dashboard"); // Redirect to dashboard after login
         }
       } catch (error) {
