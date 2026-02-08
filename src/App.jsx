@@ -29,7 +29,12 @@ const ProtectedRoute = ({ children }) => {
 };
 
 function AppContent() {
-  const { isAuthenticated, loading } = useAuth();
+  const { isAuthenticated, loading, loggingOut } = useAuth();
+
+  // Show spinner while logging out
+  if (loggingOut) {
+    return <div className='loadingSpinner'><img src="/BudgetApp/images/spinner.svg" className="spinner" alt="Logging out..." /></div>;
+  }
 
   if (loading) {
     return <div className='loadingSpinner'><img src="/BudgetApp/images/spinner.svg" className="spinner" alt="Loading spinner" /></div>;

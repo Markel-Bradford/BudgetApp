@@ -1,9 +1,16 @@
 import React from "react";
-import { Form, NavLink } from "react-router-dom";
-
-
+import { NavLink } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const Navbar = ({userName}) => {
+  const { logout } = useAuth();
+
+  const handleLogout = async (e) => {
+    e.preventDefault();
+    if (confirm("Log out?")) {
+      await logout();
+    }
+  };
   
   return (
     <>
@@ -14,24 +21,16 @@ const Navbar = ({userName}) => {
             <i className="fa-solid fa-hand-holding-dollar"></i>
           </NavLink>
           <ul className="nav-menu">
-            {/* <li>
-            {userName && (
-            <Form method="post" action="/info" onSubmit={{event}}>
-              <button type="submit" className="btn btn--info">Budget Types</button>
-          </Form>)}
-          </li> */}
-          <li>
-           {userName && (
-              <Form method="post" action="/logout" onSubmit={(event) => {
-                if (!confirm("Log out?")) {
-                    event.preventDefault() // Prevents page from deleting and refreshing
-                }
-              }}>
-                <button type="submit" className="btn btn--warning">
+            <li>
+             {userName && (
+                <button 
+                  onClick={handleLogout}
+                  className="btn btn--warning"
+                  style={{ border: 'none', cursor: 'pointer', background: 'inherit' }}
+                >
                   <span>Log out</span>
                 </button>
-              </Form>
-            )} 
+              )} 
             </li>
           </ul>
         </div>

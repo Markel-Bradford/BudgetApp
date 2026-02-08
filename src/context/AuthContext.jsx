@@ -1,11 +1,14 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { getCurrentUser } from "../helpers";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [loggingOut, setLoggingOut] = useState(false);
   const [user, setUser] = useState(null);
 
   // Initialize auth state on mount
@@ -39,14 +42,26 @@ export const AuthProvider = ({ children }) => {
     setIsAuthenticated(true);
   };
 
-  const logout = () => {
-    setUser(null);
-    setIsAuthenticated(false);
-    localStorage.removeItem("userId");
+  const logout = async () => {
+    setLoggingOut(true);
+    try {
+      // Call backend logout endpoint to clear the HTTP-only cookie
+      await axios.post("https://budgetapp-37rv.onrender.com/api/users/logout", {});
+    } catch (error) {
+      console.error("Logout error:", error);
+    } finally {
+      // Clear user data from localStorage and state
+      localStorage.removeItem("userId");
+      setUser(null);
+      setIsAuthenticated(false);
+      toast.success("You've successfully logged out!");
+      // Hard reload to reset auth state
+      window.location.href = "/BudgetApp";
+    }
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, loading, user, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, loading, loggingOut, user, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
