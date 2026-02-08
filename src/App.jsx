@@ -1,5 +1,5 @@
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { useEffect } from "react";
+import { createBrowserRouter, RouterProvider, Navigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 //Error page
 import Error from "./Pages/Error";
@@ -13,65 +13,88 @@ import { logoutAction } from "./actions/logout";
 //Helpers
 import { getCurrentUser } from "./helpers";
 
+//Pages
+import Dashboard from "./Pages/Dashboard";
+import Signin from "./Components/Signin";
+
 //Library imports
 import {ToastContainer} from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
-import Dashboard from "./Pages/Dashboard";
 
-
-
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <Main />,
-    loader: mainLoader,
-    children: [
-      {
-        path: "/",
-        element: <Dashboard />,
-        errorElement: <Error />
-      },
-    {
-      path: "/logout",
-      action: logoutAction
-    }
-    ]
-  },
-  {
-    path: "*",
-    element: <Error />    
+// Protected route component
+const ProtectedRoute = ({ isAuthenticated, children }) => {
+  if (!isAuthenticated) {
+    return <Navigate to="/" replace />;
   }
-],
-{
-  basename: "/BudgetApp", // Set basename to match gh repository
-})
+  return children;
+};
 
 function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     // Restore user session from token stored in HTTP-only cookie
     const restoreSession = async () => {
-      // Only attempt to restore if user was previously logged in
       const wasLoggedIn = localStorage.getItem("userId");
-      if (!wasLoggedIn) return;
+      if (!wasLoggedIn) {
+        setIsAuthenticated(false);
+        setLoading(false);
+        return;
+      }
 
       try {
         await getCurrentUser();
-        // User data is fetched and validated via cookie
+        setIsAuthenticated(true);
       } catch (error) {
-        // Token is invalid or expired, user needs to log in again
+        // Token is invalid or expired
         localStorage.removeItem("userId");
+        setIsAuthenticated(false);
+      } finally {
+        setLoading(false);
       }
     };
 
     restoreSession();
   }, []);
+
+  if (loading) {
+    return <div className='loadingSpinner'><img src="/BudgetApp/images/spinner.svg" className="spinner" alt="Loading spinner" /></div>;
+  }
+
+  const router = createBrowserRouter([
+    {
+      path: "/",
+      element: isAuthenticated ? <Navigate to="/dashboard" replace /> : <Signin />,
+      errorElement: <Error />
+    },
+    {
+      path: "/dashboard",
+      element: (
+        <ProtectedRoute isAuthenticated={isAuthenticated}>
+          <Dashboard />
+        </ProtectedRoute>
+      ),
+      errorElement: <Error />
+    },
+    {
+      path: "/logout",
+      action: logoutAction
+    },
+    {
+      path: "*",
+      element: <Error />    
+    }
+  ], {
+    basename: "/BudgetApp"
+  });
   
   return (
-  <div className="App">
-    <RouterProvider router = {router} />
-    <ToastContainer />
-  </div>
-  )
+    <div className="App">
+      <RouterProvider router={router} />
+      <ToastContainer />
+    </div>
+  );
 }
 
 export default App;

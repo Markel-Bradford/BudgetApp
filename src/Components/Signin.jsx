@@ -49,7 +49,7 @@ const Signin = () => {
         if ((usernameInput.trim(), emailInput.trim())) {
           newUser({ name: usernameInput.trim(), email: emailInput.trim() });
 
-          navigate("/"); // Redirect to baseroute
+          navigate("/dashboard"); // Redirect to dashboard after signup
         } else {
           toast.error("Sign-in failed. Please try again.");
         }
@@ -72,7 +72,7 @@ const Signin = () => {
             email: emailInput.trim(),
           });
 
-          navigate("/"); // Redirect to baseroute
+          navigate("/dashboard"); // Redirect to dashboard after login
         }
       } catch (error) {
         if (error.response && error.response.status === 404) {
