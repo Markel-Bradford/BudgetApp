@@ -13,6 +13,7 @@ import { toast } from "react-toastify";
 const Signin = () => {
   const [usernameInput, setUsernameInput] = useState("Guest");
   const [emailInput, setEmailInput] = useState("guest.player1086@gmail.com");
+  const [passwordInput, setPasswordInput] = useState("password123");
   const navigate = useNavigate();
   const { login } = useAuth();
 
@@ -41,56 +42,55 @@ const Signin = () => {
   const handleFormSubmit = async (e) => {
     const action = e.nativeEvent.submitter.getAttribute("data-action");
 
-    if (!usernameInput.trim() || !emailInput.trim()) {
-      toast.error("Name and email are required.");
+    if (!usernameInput.trim() || !emailInput.trim() || !passwordInput.trim()) {
+      toast.error("Name, email, and password are required.");
       return;
     }
 
     if (action === "create") {
       // Handle create account
       try {
-        if ((usernameInput.trim(), emailInput.trim())) {
-          const signupResult = await newUser({ name: usernameInput.trim(), email: emailInput.trim() });
+        if ((usernameInput.trim(), emailInput.trim(), passwordInput.trim())) {
+          const signupResult = await newUser({ name: usernameInput.trim(), email: emailInput.trim(), password: passwordInput.trim() });
           // Confirm server set cookie by fetching current user
           try {
             const current = await getCurrentUser();
             login(current);
             navigate("/dashboard");
           } catch (err) {
-            toast.error("Signup succeeded but authentication failed. Please sign in.");
+            toast.error("Signup succeeded but authentication failed. Please try again.");
           }
         } else {
-          toast.error("Sign-in failed. Please try again.");
+          toast.error("Sign-up failed. Please try again.");
         }
       } catch (error) {
         toast.error("Failed to create account. Please try again.");
       }
     } else if (action === "signin") {
-      if (!usernameInput.trim() || !emailInput.trim()) {
-        toast.error("Name and email required.");
+      if (!emailInput.trim() || !passwordInput.trim()) {
+        toast.error("Email and password required.");
         return;
       }
 
       // Handle sign in
       try {
-        // Check if user exists
-        if ((usernameInput.trim(), emailInput.trim())) {
-          const loginResult = await loginUser({
-            name: usernameInput.trim(),
-            email: emailInput.trim(),
-          });
-          // Verify cookie was set and get authoritative user
-          try {
-            const current = await getCurrentUser();
-            login(current);
-            navigate("/dashboard");
-          } catch (err) {
-            toast.error("Sign-in succeeded but authentication failed. Please try again.");
-          }
+        const loginResult = await loginUser({
+          email: emailInput.trim(),
+          password: passwordInput.trim(),
+        });
+        // Verify cookie was set and get authoritative user
+        try {
+          const current = await getCurrentUser();
+          login(current);
+          navigate("/dashboard");
+        } catch (err) {
+          toast.error("Sign-in succeeded but authentication failed. Please try again.");
         }
       } catch (error) {
         if (error.response && error.response.status === 404) {
           toast.error("User not found. Please create an account.");
+        } else if (error.response && error.response.status === 401) {
+          toast.error("Invalid email or password.");
         } else {
           toast.error("Sign-in failed. Please try again.");
         }
@@ -132,8 +132,21 @@ const Signin = () => {
             placeholder="john.doe@gmail.com"
             autoComplete="email"
             value={emailInput}
-            onFocus={handleFocus} // Clear the input on focus if it's still the default value
+            onFocus={handleFocus}
             onChange={(e) => setEmailInput(e.target.value)}
+          />
+          <input
+            type="password"
+            name="password"
+            id="password"
+            required
+            placeholder="Enter your password"
+            autoComplete="current-password"
+            value={passwordInput}
+            onFocus={(e) => {
+              e.target.value = "";
+            }}
+            onChange={(e) => setPasswordInput(e.target.value)}
           />
           <input type="hidden" name="_action" value="newUser" />
           <div className="btncontainer">

@@ -32,16 +32,16 @@ export const fetchData = async (endpoint) => {
 
 /**
  * Create a new user.
- * @param {object} user - The user data to be created.
+ * @param {object} user - The user data to be created (name, email, password).
  * @returns {Promise<object>} The created user data.
  */
 export const newUser = async (user) => {
   try {
     const response = await axios.post(`${BASE_URL}users/register`, user);
     
-    localStorage.setItem("userId", response.data._id);
-    toast.success("User created successfully!");
-    return { id: response.data._id, name: response.data.name, email: response.data.email };
+    localStorage.setItem("userId", response.data.user.id);
+    toast.success("Account created successfully!");
+    return { id: response.data.user.id, name: response.data.user.name, email: response.data.user.email };
   } catch (error) {
     toast.error("Failed to create user. Please try again.");
     throw error;
@@ -49,21 +49,18 @@ export const newUser = async (user) => {
 };
 
 /**
- * Log in a user by name and email.
- * @param {object} user - User credentials.
+ * Log in a user by email and password.
+ * @param {object} user - User credentials (email, password).
  * @returns {Promise<object>} The logged-in user data.
  */
 export const loginUser = async (user) => {
   try {
-      const response = await axios.get(`${BASE_URL}users/login`, {
-          params: user
-      });
+      const response = await axios.post(`${BASE_URL}users/login`, user);
       
       localStorage.setItem("userId", response.data.user.id);
       toast.success("Login successful!");
       return response.data.user;
   } catch (error) {
-      toast.error("Login failed. Please try again.");
       throw error;
   }
 };

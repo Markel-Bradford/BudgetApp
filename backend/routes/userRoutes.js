@@ -6,28 +6,38 @@ const authenticateUser = require("../middleware/auth");
 
 // Register a new user
 router.post("/register", async (req, res) => {
-  const { name, email } = req.body;
-  if (!name || !email) {
-    return res.status(400).json({ error: "Name and email are required." });
+  const { name, email, password } = req.body;
+  if (!name || !email || !password) {
+    return res.status(400).json({ error: "Name, email, and password are required." });
   }
   try {
-    const user = await User.create({ name, email });
-    res.status(201).json(user);
+    const user = await User.create({ name, email, password });
+    const token = jwt.sign({ id: user._id, email: user.email }, process.env.JWT_SECRET);
+    
+    res.cookie('authToken', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'None',
+      maxAge: 24 * 60 * 60 * 1000
+    });
+    
+    res.status(201).json({
+      user: { id: user._id, name: user.name, email: user.email }
+    });
   } catch (error) {
-    res.status(500).json({ error: error.message });
     if (error.code === 11000) {
       return res.status(400).json({ error: "Email already exists." });
     }
+    res.status(500).json({ error: error.message });
   }
 });
 
-// Sign in by name and email query
-router.get("/login", async (req, res) => {
-  const { name, email } = req.query;
+// Sign in by email and password
+router.post("/login", async (req, res) => {
+  const { email, password } = req.body;
 
-  // Handle missing name and email
-  if (!name || !email) {
-    return res.status(400).json({ error: "Name and email are required." });
+  if (!email || !password) {
+    return res.status(400).json({ error: "Email and password are required." });
   }
 
   const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -37,26 +47,24 @@ router.get("/login", async (req, res) => {
   }
 
   try {
-    const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-
-    const user = await User.findOne({
-      name: new RegExp(`^${escapeRegex(name)}$`, "i"),
-      email: new RegExp(`^${escapeRegex(email)}$`, "i"),
-    });
+    const user = await User.findOne({ email: email.toLowerCase() });
 
     if (!user) {
       return res.status(404).json({ error: "User not found." });
     }
 
+    const isPasswordValid = await user.matchPassword(password);
+    if (!isPasswordValid) {
+      return res.status(401).json({ error: "Invalid password." });
+    }
+
     const token = jwt.sign({ id: user._id, email: user.email }, process.env.JWT_SECRET);
     
-    // Set JWT as HTTP-only cookie. Use SameSite=None for cross-site XHR cookies.
     res.cookie('authToken', token, {
       httpOnly: true,
-      // Cookies with SameSite=None must also be Secure
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'None',
-      maxAge: 24 * 60 * 60 * 1000 // 24 hours
+      maxAge: 24 * 60 * 60 * 1000
     });
     
     res.json({
