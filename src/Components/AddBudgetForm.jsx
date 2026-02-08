@@ -36,7 +36,6 @@ const AddBudgetForm = ({ userId, refreshBudgets }) => {
       try {
         const color = getRandomColor(); // Generate a random color from helper
         const payload = {
-          userId,
           name: budgetName,
           amount: parseFloat(amount),
           color,

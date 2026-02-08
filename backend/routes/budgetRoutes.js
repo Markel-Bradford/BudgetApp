@@ -2,13 +2,15 @@ const express = require("express");
 const router = express.Router();
 const Budget = require("../models/Budget");
 const Expense = require("../models/Expense");
+const authenticateUser = require("../middleware/auth");
 
-// Add new budget
-router.post("/", async (req, res) => {
-  const { userId, name, amount, color, spent } = req.body;
+// Add new budget - requires authentication
+router.post("/", authenticateUser, async (req, res) => {
+  const { name, amount, color, spent } = req.body;
+  const userId = req.user.id; // Get userId from authenticated user's JWT
 
-  if (!userId || !name || !amount || !color) {
-    return res.status(400).json({ error: "Missing required fields" });
+  if (!name || !amount || !color) {
+    return res.status(400).json({ error: "Missing required fields (name, amount, color)" });
   }
 
   try {
@@ -20,7 +22,7 @@ router.post("/", async (req, res) => {
   }
 });
 
-router.delete("/:budgetId", async (req, res) => {
+router.delete("/:budgetId", authenticateUser, async (req, res) => {
 
   const { budgetId } = req.params;
 
@@ -49,8 +51,13 @@ router.delete("/:budgetId", async (req, res) => {
 });
 
 // Get budgets by userId
-router.get("/:userId", async (req, res) => {
+router.get("/:userId", authenticateUser, async (req, res) => {
   try {
+    // Only allow users to fetch their own budgets
+    if (req.user.id !== req.params.userId) {
+      return res.status(403).json({ error: "Unauthorized" });
+    }
+    
     const budgets = await Budget.find({ userId: req.params.userId }).populate(
       "expenses"
     );
@@ -60,7 +67,7 @@ router.get("/:userId", async (req, res) => {
   }
 });
 
-router.patch("/:budgetId", async (req, res) => {
+router.patch("/:budgetId", authenticateUser, async (req, res) => {
   const { spent } = req.body;
   try {
     const budget = await Budget.findByIdAndUpdate(

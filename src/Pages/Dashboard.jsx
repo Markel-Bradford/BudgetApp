@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { fetchData } from "../helpers";
+import { fetchData, getCurrentUser } from "../helpers";
 import { toast } from "react-toastify";
 import AddBudgetForm from "../Components/AddBudgetForm";
 import AddExpenseForm from "../Components/AddExpenseForm";
@@ -58,8 +58,8 @@ const Dashboard = () => {
           return;
         }
 
-        const fetchedUser = await fetchData(`users/${userId}`);
-        const fetchedBudgets = await fetchData(`budgets/${userId}`);
+        const fetchedUser = await getCurrentUser();
+        const fetchedBudgets = await fetchData(`budgets/${fetchedUser.id}`);
 
         setUserData({ currentUserName: fetchedUser, budgets: fetchedBudgets });
         setLoading(false); // Stop loading once data is fetched

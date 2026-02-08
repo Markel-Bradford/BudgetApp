@@ -2,9 +2,10 @@ const express = require("express");
 const router = express.Router();
 const Expense = require("../models/Expense");
 const Budget = require("../models/Budget");
+const authenticateUser = require("../middleware/auth");
 
-// Add new expense
-router.post("/", async (req, res) => {
+// Add new expense - requires authentication
+router.post("/", authenticateUser, async (req, res) => {
   const { budgetId, name, amount } = req.body;
 
   // Ensure that all required fields are present
@@ -49,7 +50,7 @@ router.post("/", async (req, res) => {
   }
 });
 
-router.delete("/:expenseId", async (req, res) => {
+router.delete("/:expenseId", authenticateUser, async (req, res) => {
   
   const expenseId = req.params.expenseId;
   
@@ -89,19 +90,17 @@ router.delete("/:expenseId", async (req, res) => {
   }
 });
 
-router.get("/:budgetId", async (req, res) => {
-
-
+router.get("/:budgetId", authenticateUser, async (req, res) => {
   try {
-    const expenses = await Expense.find({ budgetId: req.params.budgetId });
-
-    if (!expenses.length) {
-
+    // Optional: verify the budget belongs to the authenticated user
+    const budget = await Budget.findById(req.params.budgetId);
+    if (!budget || budget.userId.toString() !== req.user.id) {
+      return res.status(403).json({ error: "Unauthorized" });
     }
 
+    const expenses = await Expense.find({ budgetId: req.params.budgetId });
     res.json(expenses);
   } catch (error) {
-
     res.status(500).json({ error: error.message });
   }
 });
