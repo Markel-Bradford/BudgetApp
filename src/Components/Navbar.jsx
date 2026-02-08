@@ -26,7 +26,6 @@ const Navbar = ({userName}) => {
                 <button 
                   onClick={handleLogout}
                   className="btn btn--warning"
-                  style={{ border: 'none', cursor: 'pointer', background: 'inherit' }}
                 >
                   <span>Log out</span>
                 </button>
