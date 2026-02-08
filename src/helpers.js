@@ -19,16 +19,14 @@ export const fetchData = async (endpoint) => {
   try {
     const response = await axios.get(`${BASE_URL}${endpoint}`);
     
-    // Check if the response status is 200 (OK)
     if (response.status === 200) {
       return response.data;
     } else {
-      
-      return []; // Return an empty array if there's an error status
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
   } catch (error) {
-    
-    return [];
+    // Re-throw the error so calling code can handle it
+    throw error;
   }
 };
 

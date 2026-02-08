@@ -39,9 +39,15 @@ const Dashboard = () => {
       setRefreshedBudgets(updatedBudgets);
       setRefreshedExpenses(updatedExpenses);
     } catch (error) {
-      toast.error("Failed to refresh budgets and expenses.");
-     
-      setError("Failed to refresh data.");
+      // If it's an authentication error, silently handle it (user will be logged out)
+      if (error.response?.status === 401) {
+        localStorage.removeItem("userId");
+        setUserData({ currentUserName: null, budgets: [], expenses: [] });
+      } else {
+        // For other errors, show error toast
+        toast.error("Failed to refresh budgets and expenses.");
+        setError("Failed to refresh data.");
+      }
     }
   }, [userData.currentUserName?.id]);
 
@@ -64,8 +70,14 @@ const Dashboard = () => {
         setUserData({ currentUserName: fetchedUser, budgets: fetchedBudgets });
         setLoading(false); // Stop loading once data is fetched
       } catch (error) {
-        
-        setError("Error loading data. Please try again later.");
+        // If it's an authentication error, treat user as logged out
+        if (error.response?.status === 401) {
+          localStorage.removeItem("userId");
+          setUserData({ currentUserName: null, budgets: [], expenses: [] });
+        } else {
+          // For other errors, show error message
+          setError("Error loading data. Please try again later.");
+        }
         setLoading(false); // Stop loading if there’s an error
       }
     };
