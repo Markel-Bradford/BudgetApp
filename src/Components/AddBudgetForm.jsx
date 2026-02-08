@@ -33,23 +33,26 @@ const AddBudgetForm = ({ userId, refreshBudgets }) => {
 
     if (action === "createBudget") {
       // Handle create account
-      try {
-        const color = getRandomColor(); // Generate a random color from helper
-        const payload = {
-          name: budgetName,
-          amount: parseFloat(amount),
-          color,
-          spent: 0,
-        };
+        try {
+          const color = getRandomColor(); // Generate a random color from helper
+          const payload = {
+            name: budgetName,
+            amount: parseFloat(amount),
+            color,
+            spent: 0,
+          };
 
-        
-        await newBudget(payload);
-        toast.success("Budget added successfully!");
-        refreshBudgets();
-      } catch (error) {
-        
-        toast.error("Budget creation failed. Please try again.");
-      }
+          const res = await newBudget(payload);
+
+          if (res && (res.status === 200 || res.status === 201)) {
+            toast.success("Budget added successfully!");
+            refreshBudgets();
+          } else {
+            throw new Error("Budget creation failed");
+          }
+        } catch (error) {
+          toast.error("Budget creation failed. Please try again.");
+        }
     }
   };
 

@@ -4,10 +4,11 @@ import {
   ArrowRightEndOnRectangleIcon,
   UserPlusIcon,
 } from "@heroicons/react/24/solid";
-import { loginUser, newUser } from "../helpers";
+import { loginUser, newUser, getCurrentUser } from "../helpers";
 import { useAuth } from "../context/AuthContext";
 import axios from "axios";
 import { toast } from "react-toastify";
+ 
 
 const Signin = () => {
   const [usernameInput, setUsernameInput] = useState("Guest");
@@ -49,9 +50,15 @@ const Signin = () => {
       // Handle create account
       try {
         if ((usernameInput.trim(), emailInput.trim())) {
-          const userData = await newUser({ name: usernameInput.trim(), email: emailInput.trim() });
-          login(userData); // Update auth context
-          navigate("/dashboard"); // Redirect to dashboard after signup
+          const signupResult = await newUser({ name: usernameInput.trim(), email: emailInput.trim() });
+          // Confirm server set cookie by fetching current user
+          try {
+            const current = await getCurrentUser();
+            login(current);
+            navigate("/dashboard");
+          } catch (err) {
+            toast.error("Signup succeeded but authentication failed. Please sign in.");
+          }
         } else {
           toast.error("Sign-in failed. Please try again.");
         }
@@ -68,12 +75,18 @@ const Signin = () => {
       try {
         // Check if user exists
         if ((usernameInput.trim(), emailInput.trim())) {
-          const userData = await loginUser({
+          const loginResult = await loginUser({
             name: usernameInput.trim(),
             email: emailInput.trim(),
           });
-          login(userData); // Update auth context
-          navigate("/dashboard"); // Redirect to dashboard after login
+          // Verify cookie was set and get authoritative user
+          try {
+            const current = await getCurrentUser();
+            login(current);
+            navigate("/dashboard");
+          } catch (err) {
+            toast.error("Sign-in succeeded but authentication failed. Please try again.");
+          }
         }
       } catch (error) {
         if (error.response && error.response.status === 404) {

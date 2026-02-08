@@ -50,11 +50,12 @@ router.get("/login", async (req, res) => {
 
     const token = jwt.sign({ id: user._id, email: user.email }, process.env.JWT_SECRET);
     
-    // Set JWT as HTTP-only cookie
+    // Set JWT as HTTP-only cookie. Use SameSite=None for cross-site XHR cookies.
     res.cookie('authToken', token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production', // HTTPS only in production
-      sameSite: 'Lax', // Allow cross-origin requests (needed for GitHub Pages to Render)
+      // Cookies with SameSite=None must also be Secure
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'None',
       maxAge: 24 * 60 * 60 * 1000 // 24 hours
     });
     
@@ -89,7 +90,7 @@ router.post("/logout", (req, res) => {
   res.clearCookie("authToken", {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'Lax'
+    sameSite: 'None'
   });
   res.json({ message: "Logged out successfully" });
 });

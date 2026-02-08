@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { fetchData, getCurrentUser } from "../helpers";
+import { fetchData } from "../helpers";
+import { useAuth } from "../context/AuthContext";
+import Navbar from "../Components/Navbar";
 import { toast } from "react-toastify";
 import AddBudgetForm from "../Components/AddBudgetForm";
 import AddExpenseForm from "../Components/AddExpenseForm";
@@ -11,87 +13,82 @@ import Signin from "../Components/Signin";
  * Dashboard component that displays the user data, budgets, and expenses.
  */
 const Dashboard = () => {
-  const [userData, setUserData] = useState({
-    currentUserName: null,
-    budgets: [],
-    expenses: [],
-  });
-  const [refreshedBudgets, setRefreshedBudgets] = useState([]);
-  const [refreshedExpenses, setRefreshedExpenses] = useState([]);
-  const [loading, setLoading] = useState(true); // Add a loading state
-  const [error, setError] = useState(null); // To track any errors
+  const { user, loading: authLoading, logout } = useAuth();
+  const [budgets, setBudgets] = useState([]);
+  const [expenses, setExpenses] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   // Function to refresh budgets and expenses after actions
-  const refreshBudgets = useCallback(async () => {
-    if (!userData.currentUserName?.id) return;
+  const refreshBudgets = useCallback(
+    async (opts = { retryOn401: true }) => {
+      if (!user?.id) return;
 
-    try {
-      const updatedBudgets = await fetchData(`budgets/${userData.currentUserName.id}`);
-      const updatedExpenses = [];
-
-      // Fetch expenses for each budget
-      for (const budget of updatedBudgets) {
-        const expenses = await fetchData(`expenses/${budget._id}`);
-        updatedExpenses.push(...expenses);
-      }
-
-      // Update the state with refreshed data
-      setRefreshedBudgets(updatedBudgets);
-      setRefreshedExpenses(updatedExpenses);
-    } catch (error) {
-      // If it's an authentication error, silently handle it (user will be logged out)
-      if (error.response?.status === 401) {
-        localStorage.removeItem("userId");
-        setUserData({ currentUserName: null, budgets: [], expenses: [] });
-      } else {
-        // For other errors, show error toast
-        toast.error("Failed to refresh budgets and expenses.");
-        setError("Failed to refresh data.");
-      }
-    }
-  }, [userData.currentUserName?.id]);
-
-  useEffect(() => {
-    // Initialize the app and fetch the user data based on login status
-    const loadData = async () => {
-      setLoading(true); // Start loading while fetching the data
-      setError(null); // Reset any previous error
       try {
-        const userId = localStorage.getItem("userId");
-        if (!userId) {
-          setUserData({ currentUserName: null, budgets: [], expenses: [] });
-          setLoading(false); // Stop loading if no userId
+        const updatedBudgets = await fetchData(`budgets/${user.id}`);
+        const updatedExpenses = [];
+
+        // Fetch expenses for each budget
+        for (const budget of updatedBudgets) {
+          const expenseList = await fetchData(`expenses/${budget._id}`);
+          updatedExpenses.push(...expenseList);
+        }
+
+        setBudgets(updatedBudgets);
+        setExpenses(updatedExpenses);
+      } catch (error) {
+        console.error("Failed to refresh budgets:", error);
+        // If authentication failed, allow a single retry to handle cookie set race
+        if (error.response?.status === 401) {
+          if (opts.retryOn401) {
+            // wait briefly for cookie propagation then retry once
+            setTimeout(() => refreshBudgets({ retryOn401: false }), 300);
+            return;
+          }
+          // After one retry, show an auth error but don't force logout to avoid redirect loops
+          toast.error("Authentication required. Please sign in again.");
           return;
         }
+        toast.error("Failed to refresh budgets and expenses.");
+      }
+    },
+    [user?.id, logout]
+  );
 
-        const fetchedUser = await getCurrentUser();
-        const fetchedBudgets = await fetchData(`budgets/${fetchedUser.id}`);
+  // Fetch budgets when user is loaded
+  useEffect(() => {
+    if (authLoading) {
+      setLoading(true);
+      return;
+    }
 
-        setUserData({ currentUserName: fetchedUser, budgets: fetchedBudgets });
-        setLoading(false); // Stop loading once data is fetched
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    const loadData = async () => {
+      try {
+        // allow a short delay after login so the auth cookie can be set
+        await new Promise((res) => setTimeout(res, 250));
+        await refreshBudgets();
       } catch (error) {
-        // If it's an authentication error, treat user as logged out
-        if (error.response?.status === 401) {
-          localStorage.removeItem("userId");
-          setUserData({ currentUserName: null, budgets: [], expenses: [] });
-        } else {
-          // For other errors, show error message
-          setError("Error loading data. Please try again later.");
-        }
-        setLoading(false); // Stop loading if there’s an error
+        setError("Error loading data. Please try again later.");
+      } finally {
+        setLoading(false);
       }
     };
 
-    loadData(); // Call the initialization on component mount
-  }, []);
+    loadData();
+  }, [user, authLoading, refreshBudgets]);
 
-  useEffect(() => {
-    if (userData.currentUserName?.id) {
-      refreshBudgets(); // Refresh only when user is present
-    }
-  }, [userData.currentUserName?.id, refreshBudgets]);
-
-  const { currentUserName } = userData; // Destructure user data
+  // Render Navbar and redirect to signin if not authenticated
+  if (!authLoading && !user) {
+    return <Signin />;
+  }
 
   // Show error message if there's an issue loading data
   if (error) {
@@ -104,54 +101,51 @@ const Dashboard = () => {
   }
 
   return (
-    <>
-      {currentUserName ? (
-        <div className="dashboard">
-          <h1 className="welcome">
-            Welcome, <span className="accent">{currentUserName.name}</span>
-          </h1>
-          <div className="grid-sm">
-            {refreshedBudgets.length > 0 ? (
-              <div className="grid-lg">
-                <div className="flex-lg">
-                  <AddBudgetForm
-                    userId={currentUserName.id}
-                    refreshBudgets={refreshBudgets}
-                  />
-                  <AddExpenseForm
-                    budgets={refreshedBudgets}
-                    budgetsId={refreshedBudgets.map((budget) => budget._id)}
-                    refreshBudgets={refreshBudgets}
-                  />
-                </div>
-                <h2 className="sectionTitle">Current Budgets</h2>
-                <div className="currentBudgets">
-                  {refreshedBudgets.map((budget) => (
-                    <BudgetItem
-                      key={budget._id}
-                      budget={budget}
-                      expenses={refreshedExpenses}
-                      refreshBudgets={refreshBudgets}
-                    />
-                  ))}
-                </div>
-                <Expenses budgets={refreshedBudgets} refreshBudgets={refreshBudgets} />
-              </div>
-            ) : (
-              <div>
-                <p id="getstarted">
-                  Take the first steps towards achieving financial freedom.
-                  Create a new budget!
-                </p>
-                <AddBudgetForm userId={currentUserName.id} refreshBudgets={refreshBudgets} />
-              </div>
-            )}
+    <div>
+      <Navbar userName={user?.name} />
+      <div className="dashboard">
+        <h1 className="welcome">
+          Welcome, <span className="accent">{user.name}</span>
+        </h1>
+      <div className="grid-sm">
+        {budgets.length > 0 ? (
+          <div className="grid-lg">
+            <div className="flex-lg">
+              <AddBudgetForm
+                userId={user.id}
+                refreshBudgets={refreshBudgets}
+              />
+              <AddExpenseForm
+                budgets={budgets}
+                budgetsId={budgets.map((budget) => budget._id)}
+                refreshBudgets={refreshBudgets}
+              />
+            </div>
+            <h2 className="sectionTitle">Current Budgets</h2>
+            <div className="currentBudgets">
+              {budgets.map((budget) => (
+                <BudgetItem
+                  key={budget._id}
+                  budget={budget}
+                  expenses={expenses}
+                  refreshBudgets={refreshBudgets}
+                />
+              ))}
+            </div>
+            <Expenses budgets={budgets} refreshBudgets={refreshBudgets} />
           </div>
-        </div>
-      ) : (
-        <Signin />
-      )}
-    </>
+        ) : (
+          <div>
+            <p id="getstarted">
+              Take the first steps towards achieving financial freedom.
+              Create a new budget!
+            </p>
+            <AddBudgetForm userId={user.id} refreshBudgets={refreshBudgets} />
+          </div>
+        )}
+      </div>
+    </div>
+  </div>
   );
 };
 
