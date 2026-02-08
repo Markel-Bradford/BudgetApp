@@ -1,7 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const User = require("../models/User");
-const { toast } = require("react-toastify");
+const jwt = require("jsonwebtoken");
+const authenticateUser = require("../middleware/auth");
 
 // Register a new user
 router.post("/register", async (req, res) => {
@@ -43,16 +44,22 @@ router.get("/login", async (req, res) => {
       email: new RegExp(`^${escapeRegex(email)}$`, "i"),
     });
 
-    // If user not found, return 404
     if (!user) {
       return res.status(404).json({ error: "User not found." });
     }
 
-    // Respond with user details
+    const token = jwt.sign({ id: user._id, email: user.email }, process.env.JWT_SECRET);
+    
+    // Set JWT as HTTP-only cookie
+    res.cookie('authToken', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'Strict',
+      maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    });
+    
     res.json({
-      id: user._id,
-      name: user.name,
-      email: user.email,
+      user: { id: user._id, name: user.name, email: user.email }
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -60,16 +67,14 @@ router.get("/login", async (req, res) => {
 });
 
 // Get user information
-router.get("/:userId", async (req, res) => {
+// New secure endpoint - get current user
+router.get("/me", authenticateUser, async (req, res) => {
   try {
-    const user = await User.findById(req.params.userId);
-
-    // If user not found, return 404
+    const user = await User.findById(req.user.id);
     if (!user) {
       return res.status(404).json({ error: "User not found." });
     }
 
-    // Respond with user details
     res.json({
       id: user._id,
       name: user.name,
@@ -79,5 +84,13 @@ router.get("/:userId", async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-
+// Logout endpoint - clear the authentication cookie
+router.post("/logout", (req, res) => {
+  res.clearCookie("authToken", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'Strict'
+  });
+  res.json({ message: "Logged out successfully" });
+});
 module.exports = router;

@@ -1,4 +1,5 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { useEffect } from "react";
 
 //Error page
 import Error from "./Pages/Error";
@@ -8,6 +9,9 @@ import Main, { mainLoader } from "./layouts/Main";
 
 //Actions
 import { logoutAction } from "./actions/logout";
+
+//Helpers
+import { getCurrentUser } from "./helpers";
 
 //Library imports
 import {ToastContainer} from "react-toastify";
@@ -43,6 +47,21 @@ const router = createBrowserRouter([
 })
 
 function App() {
+  useEffect(() => {
+    // Restore user session from token stored in HTTP-only cookie
+    const restoreSession = async () => {
+      try {
+        await getCurrentUser();
+        // User data is fetched and validated via cookie
+      } catch (error) {
+        // Token is invalid or expired, user needs to log in again
+        // Cookies are automatically cleared on the backend
+        localStorage.removeItem("userId");
+      }
+    };
+
+    restoreSession();
+  }, []);
   
   return (
   <div className="App">

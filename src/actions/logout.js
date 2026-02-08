@@ -1,28 +1,31 @@
 import { redirect } from "react-router-dom";
-import { deleteItem } from "../helpers"; // Ensure deleteItem handles clearing from storage
+import axios from "axios";
 import { toast } from "react-toastify";
 
+const BASE_URL = "https://budgetapp-37rv.onrender.com/api/";
+
 /**
- * Log the user out by deleting session data and redirecting.
+ * Log the user out by calling logout endpoint and clearing client-side data.
  * @returns {Promise} Redirects to the home page after logout.
  */
 export async function logoutAction() {
     try {
-        // Delete the user session data (e.g., userId or auth token)
-        deleteItem({
-            type: "user", 
-        });
+        // Call backend logout endpoint to clear the HTTP-only cookie
+        await axios.post(`${BASE_URL}users/logout`, {});
+
+        // Clear user data from localStorage
+        localStorage.removeItem("userId");
 
         // Display success toast notification
         toast.success("You've successfully logged out!");
         
-        // Hard reload after redirect to ensure all client-side state resets
-        setTimeout(() => {
-            window.location.href = "/BudgetApp"; // Replace with your base path
-        }, 200); // Delay to allow toast to display
-        return redirect("/")
+        // Redirect after logout
+        return redirect("/");
     } catch (error) {
-        toast.error("Logout failed. Please try again.");
-        return redirect("/"); // Stay on the dashboard in case of error
+        console.error("Logout error:", error);
+        // Clear localStorage anyway if logout fails
+        localStorage.removeItem("userId");
+        toast.error("Logout completed. Please refresh if needed.");
+        return redirect("/");
     }
 }

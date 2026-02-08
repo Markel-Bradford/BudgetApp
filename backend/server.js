@@ -1,6 +1,7 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const path = require('path');
+const cookieParser = require('cookie-parser');
 const connectDB = require('./config/db');
 const userRoutes = require('./routes/userRoutes');
 const budgetRoutes = require('./routes/budgetRoutes');
@@ -36,7 +37,10 @@ app.use(cors({
 }));
 
 // Middleware to parse JSON
-app.use(express.json()); 
+app.use(express.json());
+
+// Middleware to parse cookies
+app.use(cookieParser()); 
 
 // API Routes
 app.use('/api/users', userRoutes);

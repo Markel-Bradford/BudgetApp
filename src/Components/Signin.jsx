@@ -1,6 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Form, useFetcher, useNavigate } from "react-router-dom";
-import { ArrowRightEndOnRectangleIcon, UserPlusIcon } from "@heroicons/react/24/solid";
+import {
+  ArrowRightEndOnRectangleIcon,
+  UserPlusIcon,
+} from "@heroicons/react/24/solid";
 import { loginUser, newUser } from "../helpers";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -16,22 +19,21 @@ const Signin = () => {
       e.target.value = "";
     }
   };
-  
+
   useEffect(() => {
     const handleLoad = () => {
       toast.info(
         "For guests, please press sign in to use the current credentials. Otherwise, input your name and email to create a new account or sign in if returning user.",
-        { autoClose: 12000 } // Optional: Prevent toast from auto-closing
+        { autoClose: 12000 }, // Optional: Prevent toast from auto-closing
       );
     };
 
     const timeout = setTimeout(handleLoad, 1500);
-    
 
     return () => {
       clearTimeout(timeout); // Cleanup timeout on unmount
-    }
-  }, [])
+    };
+  }, []);
 
   const handleFormSubmit = async (e) => {
     const action = e.nativeEvent.submitter.getAttribute("data-action");
@@ -44,42 +46,38 @@ const Signin = () => {
     if (action === "create") {
       // Handle create account
       try {
-        if (usernameInput.trim(), emailInput.trim()) {
-          newUser({name: usernameInput.trim(), email: emailInput.trim()});
-          
-            navigate("/"); // Redirect to baseroute
+        if ((usernameInput.trim(), emailInput.trim())) {
+          newUser({ name: usernameInput.trim(), email: emailInput.trim() });
 
-          
-
-          
+          navigate("/"); // Redirect to baseroute
         } else {
-          
           toast.error("Sign-in failed. Please try again.");
         }
       } catch (error) {
-        
         toast.error("Failed to create account. Please try again.");
       }
     } else if (action === "signin") {
       if (!usernameInput.trim() || !emailInput.trim()) {
-        toast.error("Name and email required.")
-        
-        return
+        toast.error("Name and email required.");
+
+        return;
       }
-  
+
       // Handle sign in
       try {
         // Check if user exists
-        if (usernameInput.trim(), emailInput.trim()) {
-          await loginUser({name: usernameInput.trim(), email: emailInput.trim()});
-          
-            navigate("/"); // Redirect to baseroute
+        if ((usernameInput.trim(), emailInput.trim())) {
+          await loginUser({
+            name: usernameInput.trim(),
+            email: emailInput.trim(),
+          });
+
+          navigate("/"); // Redirect to baseroute
         }
       } catch (error) {
         if (error.response && error.response.status === 404) {
           toast.error("User not found. Please create an account.");
         } else {
-          
           toast.error("Sign-in failed. Please try again.");
         }
       }
@@ -108,30 +106,34 @@ const Signin = () => {
             required
             placeholder="What is your name?"
             autoComplete="given-name"
-            value={ usernameInput }
+            value={usernameInput}
             onFocus={handleFocus} // Clear the input on focus if it's still the default value
             onChange={(e) => setUsernameInput(e.target.value)} // Update state dunamically
           />
-          <input 
-          type="email"
-          name="email"
-          id="email"
-          required
-          placeholder="john.doe@gmail.com"
-          autoComplete="email"
-          value={ emailInput }
-          onFocus={handleFocus} // Clear the input on focus if it's still the default value
-          onChange={(e) => setEmailInput(e.target.value)} />
+          <input
+            type="email"
+            name="email"
+            id="email"
+            required
+            placeholder="john.doe@gmail.com"
+            autoComplete="email"
+            value={emailInput}
+            onFocus={handleFocus} // Clear the input on focus if it's still the default value
+            onChange={(e) => setEmailInput(e.target.value)}
+          />
           <input type="hidden" name="_action" value="newUser" />
           <div className="btncontainer">
-          <button type="submit" className="submitbutton" data-action="create">
-            Create Account
-            <UserPlusIcon width={20} />
-          </button>
-          <button type="submit" className="submitbutton signin" data-action="signin">
-            Sign In
-            <ArrowRightEndOnRectangleIcon width={20} />
-          </button>
+            <button type="submit" className="submitbutton" data-action="create">
+              Create Account
+              <UserPlusIcon width={20} />
+            </button>
+            <button
+              type="submit"
+              className="submitbutton signin"
+              data-action="signin">
+              Sign In
+              <ArrowRightEndOnRectangleIcon width={20} />
+            </button>
           </div>
         </Form>
       </div>

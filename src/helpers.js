@@ -7,6 +7,9 @@ import { toast } from "react-toastify";
 // Constants
 const BASE_URL = "https://budgetapp-37rv.onrender.com/api/"; // Base URL for API calls (modify as needed)
 
+// Configure axios to include credentials (cookies) with all requests
+axios.defaults.withCredentials = true;
+
 /**
  * Fetch data from the API.
  * @param {string} endpoint - The endpoint to fetch data from (e.g., "budgets" or "expenses").
@@ -54,16 +57,33 @@ export const newUser = async (user) => {
 export const loginUser = async (user) => {
   try {
       const response = await axios.get(`${BASE_URL}users/login`, {
-          params: user,
+          params: user
       });
       
-      localStorage.setItem("userId", response.data.id);
+      localStorage.setItem("userId", response.data.user.id);
       toast.success("Login successful!");
-      return response.data;
+      return response.data.user;
   } catch (error) {
-      
       toast.error("Login failed. Please try again.");
       throw error;
+  }
+};
+
+/**
+ * Fetch current authenticated user data.
+ * @returns {Promise<object>} The current user data.
+ */
+export const getCurrentUser = async () => {
+  try {
+    const response = await axios.get(`${BASE_URL}users/me`, {
+      withCredentials: true // Include cookies in request
+    });
+    return response.data;
+  } catch (error) {
+    toast.error("Failed to fetch user data.");
+    throw error;
+  }
+};
   }
 };
 
