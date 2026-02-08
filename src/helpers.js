@@ -84,8 +84,7 @@ export const getCurrentUser = async () => {
     throw error;
   }
 };
-  }
-};
+
 
 /**
  * Create a new budget.
