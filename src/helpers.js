@@ -75,12 +75,14 @@ export const loginUser = async (user) => {
  */
 export const getCurrentUser = async () => {
   try {
-    const response = await axios.get(`${BASE_URL}users/me`, {
-      withCredentials: true // Include cookies in request
-    });
+    const response = await axios.get(`${BASE_URL}users/me`);
     return response.data;
   } catch (error) {
-    toast.error("Failed to fetch user data.");
+    // Only show error toast if it's not a 401 (authentication error)
+    // 401 is expected when user hasn't logged in
+    if (error.response?.status !== 401) {
+      toast.error("Failed to fetch user data.");
+    }
     throw error;
   }
 };

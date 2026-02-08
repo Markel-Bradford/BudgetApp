@@ -50,12 +50,15 @@ function App() {
   useEffect(() => {
     // Restore user session from token stored in HTTP-only cookie
     const restoreSession = async () => {
+      // Only attempt to restore if user was previously logged in
+      const wasLoggedIn = localStorage.getItem("userId");
+      if (!wasLoggedIn) return;
+
       try {
         await getCurrentUser();
         // User data is fetched and validated via cookie
       } catch (error) {
         // Token is invalid or expired, user needs to log in again
-        // Cookies are automatically cleared on the backend
         localStorage.removeItem("userId");
       }
     };
