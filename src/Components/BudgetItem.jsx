@@ -14,7 +14,7 @@ const BudgetItem = ({ budget, expenses, onDeleteBudget, refreshBudgets }) => {
         await deleteBudget(_id); // Call the deleteBudget helper
         refreshBudgets(); // Refresh the budgets and expenses data
       } catch (error) {
-        console.error("Error deleting budget:", error);
+        
       } finally {
         setIsDeleting(false);
       }
@@ -37,7 +37,7 @@ const BudgetItem = ({ budget, expenses, onDeleteBudget, refreshBudgets }) => {
         // Update local state
         setTotalSpent(updatedSpent);
       } catch (error) {
-        console.error("Error updating spent amount:", error);
+        
       }
     };
 

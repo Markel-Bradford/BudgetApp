@@ -3,7 +3,7 @@ import { deleteExpenseAndUpdateBudget } from "../helpers";
 import { TrashIcon } from "@heroicons/react/24/solid";
 
 const Expenses = ({ budgets, refreshBudgets }) => {
-  console.log("Budgets passed to Expenses:", budgets); // Add this log to verify the data
+  
 
   const handleDeleteExpense = async (expenseId, budgetId) => {
     try {
@@ -20,7 +20,7 @@ const Expenses = ({ budgets, refreshBudgets }) => {
         )
       );
     } catch (error) {
-      console.error("Error deleting expense:", error);
+      
     }
   };
 
@@ -42,11 +42,10 @@ const BudgetWithExpenses = ({ budget, onDeleteExpense, refreshBudgets }) => {
   const [isExpanded, setIsExpanded] = React.useState(false);
   const toggleExpenses = () => setIsExpanded(!isExpanded);
 
-  console.log("Budget object:", budget); // Log the budget object
+  
 
   const expenses = Array.isArray(budget.expenses) ? budget.expenses : [];
-  console.log(expenses);
-  console.log("Expenses in each budget:", budget.expenses);
+ 
 
   return (
     <div className="budgetExpenseList">
@@ -81,7 +80,7 @@ const ExpenseItem = ({ expense, budgetId, onDeleteExpense }) => {
       try {
         await onDeleteExpense(expense._id, budgetId, expense.amount);
       } catch (error) {
-        console.error("Error deleting expense:", error);
+        
       } finally {
         setIsDeleting(false);
       }

@@ -50,7 +50,7 @@ const AddExpenseForm = ({ budgets, refreshBudgets }) => {
           amount: parseFloat(expenseAmount),
         };
 
-        console.log("Expense Payload:", payload); // Debug log
+        
         await newExpense(payload);
         toast.success("Expense added successfully!");
         setExpenseName("");
@@ -58,7 +58,7 @@ const AddExpenseForm = ({ budgets, refreshBudgets }) => {
         setSelectedBudgetId(budgets.length === 1 ? budgets[0]._id : ""); // Reset budget selection if multiple
         refreshBudgets()
       } catch (error) {
-        console.error("Error creating expense:", error);
+        
         if (error.response?.status === 400) {
           toast.error("Invalid input. Please check your data.");
         } else {

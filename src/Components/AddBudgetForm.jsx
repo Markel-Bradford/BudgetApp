@@ -43,12 +43,12 @@ const AddBudgetForm = ({ userId, refreshBudgets }) => {
           spent: 0,
         };
 
-        console.log("Budget Payload:", payload); // Debug log
+        
         await newBudget(payload);
         toast.success("Budget added successfully!");
         refreshBudgets();
       } catch (error) {
-        console.error("Error creating budget:", error);
+        
         toast.error("Budget creation failed. Please try again.");
       }
     }

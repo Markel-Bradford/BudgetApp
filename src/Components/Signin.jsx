@@ -51,19 +51,19 @@ const Signin = () => {
 
           
 
-          console.log("User created:", usernameInput, emailInput);
+          
         } else {
-          console.error("Error signing in:", error);
+          
           toast.error("Sign-in failed. Please try again.");
         }
       } catch (error) {
-        console.error("Error creating account:", error);
+        
         toast.error("Failed to create account. Please try again.");
       }
     } else if (action === "signin") {
       if (!usernameInput.trim() || !emailInput.trim()) {
         toast.error("Name and email required.")
-        console.log("Please enter a name and email.")
+        
         return
       }
   
@@ -79,7 +79,7 @@ const Signin = () => {
         if (error.response && error.response.status === 404) {
           toast.error("User not found. Please create an account.");
         } else {
-          console.error("Error signing in:", error);
+          
           toast.error("Sign-in failed. Please try again.");
         }
       }

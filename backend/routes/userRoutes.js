@@ -36,12 +36,11 @@ router.get("/login", async (req, res) => {
   }
 
   try {
-    console.log("Login attempt:", { name, email }); // Log the input data
+    const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
-    // Find user by query of name and email
     const user = await User.findOne({
-      name: new RegExp(`^${name}$`, "i"),
-      email: new RegExp(`^${email}$`, "i"),
+      name: new RegExp(`^${escapeRegex(name)}$`, "i"),
+      email: new RegExp(`^${escapeRegex(email)}$`, "i"),
     });
 
     // If user not found, return 404
@@ -49,7 +48,6 @@ router.get("/login", async (req, res) => {
       return res.status(404).json({ error: "User not found." });
     }
 
-    console.log("User found:", user); // Log the retrieved user
     // Respond with user details
     res.json({
       id: user._id,
@@ -57,30 +55,29 @@ router.get("/login", async (req, res) => {
       email: user.email,
     });
   } catch (error) {
-    console.error("Error during login:", error); // Log full error details
     res.status(500).json({ error: error.message });
   }
 });
 
 // Get user information
 router.get("/:userId", async (req, res) => {
-    try {
-      const user = await User.findById(req.params.userId);
-  
-      // If user not found, return 404
-      if (!user) {
-        return res.status(404).json({ error: "User not found." });
-      }
-  
-      // Respond with user details
-      res.json({
-        id: user._id,
-        name: user.name,
-        email: user.email,
-      });
-    } catch (error) {
-      res.status(500).json({ error: error.message });
+  try {
+    const user = await User.findById(req.params.userId);
+
+    // If user not found, return 404
+    if (!user) {
+      return res.status(404).json({ error: "User not found." });
     }
-  });
+
+    // Respond with user details
+    res.json({
+      id: user._id,
+      name: user.name,
+      email: user.email,
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
 module.exports = router;

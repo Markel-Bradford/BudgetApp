@@ -20,11 +20,11 @@ export const fetchData = async (endpoint) => {
     if (response.status === 200) {
       return response.data;
     } else {
-      console.error(`Failed to fetch data from ${endpoint}: ${response.statusText}`);
+      
       return []; // Return an empty array if there's an error status
     }
   } catch (error) {
-    console.error(`Error fetching data from ${endpoint}:`, error);
+    
     return [];
   }
 };
@@ -37,11 +37,11 @@ export const fetchData = async (endpoint) => {
 export const newUser = async (user) => {
   try {
     const response = await axios.post(`${BASE_URL}users/register`, user);
-    console.log(response.data);
+    
     localStorage.setItem("userId", response.data._id);
     toast.success("User created successfully!");
   } catch (error) {
-    console.error("Error creating user:", error);
+    
     toast.error("Failed to create user. Please try again.");
   }
 };
@@ -56,12 +56,12 @@ export const loginUser = async (user) => {
       const response = await axios.get(`${BASE_URL}users/login`, {
           params: user,
       });
-      console.log("Logged in user:", response.data);
+      
       localStorage.setItem("userId", response.data.id);
       toast.success("Login successful!");
       return response.data;
   } catch (error) {
-      console.error("Error logging in user:", error);
+      
       toast.error("Login failed. Please try again.");
       throw error;
   }
@@ -75,10 +75,10 @@ export const loginUser = async (user) => {
 export const newBudget = async (budget) => {
   try {
     const response = await axios.post(`${BASE_URL}budgets`, budget);
-    console.log("Budget Payload:", budget);
+    
     return response
   } catch (error) {
-    console.error("Error creating budget:", error);
+    
     toast.error("Failed to create budget. Please try again.");
   }
 };
@@ -91,10 +91,10 @@ export const newBudget = async (budget) => {
 export const newExpense = async (expense) => {
   try {
     const response = await axios.post(`${BASE_URL}expenses`, expense);
-    console.log(response.data)
+   
     return response
   } catch (error) {
-    console.error("Error creating expense:", error);
+    
     toast.error("Failed to add expense. Please try again.");
   }
 };
@@ -115,7 +115,7 @@ export const deleteItem = async ({ type, id }) => {
       toast.success("Item deleted successfully!");
     }
   } catch (error) {
-    console.error(`Error deleting ${type} with id ${id}:`, error);
+    
     toast.error("Failed to delete item. Please try again.");
   }
 };
@@ -131,7 +131,7 @@ export const deleteExpenseAndUpdateBudget = async (expenseId, budgetId, amount) 
   
   try {
     // Debugging line to check what expenseId is
-    console.log("Deleting expense with ID:", expenseId);
+    
     
     // Delete the expense and fetch the updated budget
     const {data : updatedBudget} = await axios.delete(`${BASE_URL}expenses/${expenseId}`);
@@ -140,7 +140,7 @@ export const deleteExpenseAndUpdateBudget = async (expenseId, budgetId, amount) 
 
     return updatedBudget;
   } catch (error) {
-    console.error("Error deleting expense and updating budget:", error);
+   
     toast.error("Failed to delete expense and update budget.");
   }
 };
@@ -154,14 +154,14 @@ export const deleteBudget = async (budgetId) => {
   
   try {
     // Debugging line to check what expenseId is
-    console.log("Deleting budget with ID:", budgetId);
+    
     
     // Delete the expense
     await axios.delete(`${BASE_URL}budgets/${budgetId}`);
     toast.success("Budget deleted successfully!");
     
   } catch (error) {
-    console.error("Error deleting budget:", error);
+    
     toast.error("Failed to delete budget.");
   }
 };

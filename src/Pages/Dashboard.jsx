@@ -40,7 +40,7 @@ const Dashboard = () => {
       setRefreshedExpenses(updatedExpenses);
     } catch (error) {
       toast.error("Failed to refresh budgets and expenses.");
-      console.error("Error refreshing data:", error);
+     
       setError("Failed to refresh data.");
     }
   }, [userData.currentUserName?.id]);
@@ -64,7 +64,7 @@ const Dashboard = () => {
         setUserData({ currentUserName: fetchedUser, budgets: fetchedBudgets });
         setLoading(false); // Stop loading once data is fetched
       } catch (error) {
-        console.error("Error loading data:", error);
+        
         setError("Error loading data. Please try again later.");
         setLoading(false); // Stop loading if there’s an error
       }

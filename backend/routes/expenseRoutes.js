@@ -26,7 +26,6 @@ router.post("/", async (req, res) => {
     }
 
     const expense = await Expense.create({ budgetId, name, amount });
-    console.log("Created expense:", expense);
 
     // Update corresponding budgets spent amout
     const updatedBudget = await Budget.findByIdAndUpdate(
@@ -41,22 +40,17 @@ router.post("/", async (req, res) => {
       throw new Error("Budget not found");
     }
 
-    // Log to onfirm the update budget
-    console.log("Updated budget:", updatedBudget);
 
-    // Log expense to verify proper creation
-    console.log("Newly created expense:", expense);
 
     // Respond with newly created expense
     res.status(201).json(expense);
   } catch (error) {
-    console.error("Error while creating expense:", error.message);
     res.status(500).json({ error: error.message });
   }
 });
 
 router.delete("/:expenseId", async (req, res) => {
-  console.log(`Expense deleted for expense ID: ${req.params.expenseId}`);
+  
   const expenseId = req.params.expenseId;
   
   try {
@@ -76,7 +70,7 @@ router.delete("/:expenseId", async (req, res) => {
     const updatedBudget = await Budget.findByIdAndUpdate(
         expense.budgetId,
         {
-          $pull: { expenses: req.params.expenseId }, // Add the new expense ID to the expenses array
+          $pull: { expenses: req.params.expenseId }, // Remove the expense ID from the expenses array
           $inc: { spent: -expense.amount }, // Decrement the spent amount
         },
         { new: true }
@@ -87,27 +81,27 @@ router.delete("/:expenseId", async (req, res) => {
     //   Delete the expense
     await Expense.findByIdAndDelete(expenseId);
 
-    console.log(`Expense deleted with ID: ${req.params.expenseId}`);
+
     res.status(200).json({ message: "Expense deleted successfully", updatedBudget });
   } catch (error) {
-    console.error("Error deleting expenses:", error.message);
+
     res.status(500).json({ error: error.message });
   }
 });
 
 router.get("/:budgetId", async (req, res) => {
-  console.log(`Fetching expenses for budget ID: ${req.params.budgetId}`);
+
 
   try {
     const expenses = await Expense.find({ budgetId: req.params.budgetId });
 
     if (!expenses.length) {
-      console.log(`No expenses found for budget ID: ${req.params.budgetId}`);
+
     }
 
     res.json(expenses);
   } catch (error) {
-    console.error("Error fetching expenses:", error.message);
+
     res.status(500).json({ error: error.message });
   }
 });

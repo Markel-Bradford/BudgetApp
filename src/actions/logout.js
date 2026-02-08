@@ -22,7 +22,6 @@ export async function logoutAction() {
         }, 200); // Delay to allow toast to display
         return redirect("/")
     } catch (error) {
-        console.error("Error logging out:", error);
         toast.error("Logout failed. Please try again.");
         return redirect("/"); // Stay on the dashboard in case of error
     }

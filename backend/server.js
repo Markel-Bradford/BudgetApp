@@ -13,8 +13,6 @@ dotenv.config();
 // Connect to MongoDB
 connectDB();
 
-console.log(connectDB)
-
 const app = express();
 
 // Restrict CORS
@@ -29,7 +27,7 @@ app.use(cors({
         if (!origin || allowedOrigins.includes(origin)) {
             callback(null, true);
         } else {
-            console.error(`Blocked by CORS: Origin ${origin}`);
+            
             callback(new Error(`CORS Error: Origin ${origin} is not allowed`));
         }
     },
@@ -56,4 +54,8 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => {
+    if (process.env.NODE_ENV !== 'production') {
+        console.log(`Server running on port ${PORT}`);
+    }
+});

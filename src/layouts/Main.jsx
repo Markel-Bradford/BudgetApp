@@ -42,7 +42,6 @@ export async function mainLoader() {
             expenses: Array.isArray(expenses) ? expenses : [], // Ensure expenses is always an array
           };
         } catch (error) {
-          console.error(`Error fetching expenses for budget ${budget._id}:`, error);
           return {
             ...budget,
             expenses: [], // Fallback to empty array if fetching expenses fails
@@ -57,7 +56,6 @@ export async function mainLoader() {
       budgets: updatedBudgets,
     };
   } catch (error) {
-    console.error("Error loading data:", error);
 
     // Return default data if there's an error
     return { currentUserName: null, budgets: [] };
